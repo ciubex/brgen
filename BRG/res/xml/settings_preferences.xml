@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/gui_category" >
+        <CheckBoxPreference
+            android:key="enableFastScroll"
+            android:summary="@string/enable_fast_scroll_desc"
+            android:title="@string/enable_fast_scroll" />
+
+        <EditTextPreference
+            android:defaultValue="@string/displayDateFormat"
+            android:key="displayDateFormat"
+            android:summary="@string/displayDateFormat"
+            android:title="@string/str_displayDateFormat" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/general_settings" >
+        <EditTextPreference
+            android:defaultValue="@string/date_format"
+            android:key="dateFormat"
+            android:summary="@string/date_format"
+            android:title="@string/str_dateFormat" />
+
+        <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/choose_calendar"
+            android:entryValues="@array/choose_calendar_values"
+            android:key="calendarList"
+            android:summary="@string/select_calendar"
+            android:title="@string/str_calendar" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/reminder_settings" >
+        <EditTextPreference
+            android:defaultValue="@string/reminderTitleFormat"
+            android:key="reminderTitleFormat"
+            android:summary="@string/reminderTitleFormat"
+            android:title="@string/str_reminderTitleFormat" />
+        <EditTextPreference
+            android:defaultValue="@string/reminderDescriptionFormat"
+            android:key="reminderDescriptionFormat"
+            android:summary="@string/reminderDescriptionFormat"
+            android:title="@string/str_reminderDescriptionFormat" />
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/choose_reminder_type"
+            android:entryValues="@array/choose_reminder_type_values"
+            android:key="reminderType"
+            android:summary="@string/select_reminder_type"
+            android:title="@string/str_reminderType" />
+        <ListPreference
+            android:defaultValue="-1"
+            android:entries="@array/choose_reminder_before"
+            android:entryValues="@array/choose_reminder_before_values"
+            android:key="reminderBefore"
+            android:summary="@string/select_reminder_before"
+            android:title="@string/str_reminderBefore" />
+
+        <CheckBoxPreference
+            android:disableDependentsState="true"
+            android:key="isAllDay"
+            android:summary="@string/str_isAllDaySummary"
+            android:title="@string/str_isAllDay" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/time_title" >
+        <ro.ciubex.brg.form.TimePreference
+            android:defaultValue="@string/reminderStartTime"
+            android:dependency="isAllDay"
+            android:key="reminderStartTime"
+            android:shouldDisableView="true"
+            android:showDefault="true"
+            android:summary="@string/str_when_start"
+            android:title="@string/str_reminderStartTime" />
+        <ro.ciubex.brg.form.TimePreference
+            android:defaultValue="@string/reminderEndTime"
+            android:dependency="isAllDay"
+            android:key="reminderEndTime"
+            android:shouldDisableView="true"
+            android:showDefault="true"
+            android:summary="@string/str_when_end"
+            android:title="@string/str_reminderEndTime" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
