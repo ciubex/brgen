@@ -268,6 +268,9 @@ public class ContactsListFragment extends BaseFragment implements
 		}
 	}
 
+	/**
+	 * Method used to create the list view.
+	 */
 	private void preparePhoneContactsList() {
 		mAdapter = new ContactListAdapter(mApplication,
 				mApplication.getContacts(), mApplication.getDefaultLocale());
@@ -432,6 +435,9 @@ public class ContactsListFragment extends BaseFragment implements
 		new BirthdayRemoveAsyncTask(mApplication, this, contact).execute();
 	}
 
+	/**
+	 * Method invoked at the end of birthday removing.
+	 */
 	@Override
 	public void removeProcessResult(boolean result, Contact contact) {
 		if (result) {

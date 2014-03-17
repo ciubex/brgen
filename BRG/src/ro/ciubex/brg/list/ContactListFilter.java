@@ -27,6 +27,9 @@ import ro.ciubex.brg.model.Contact;
 import android.widget.Filter;
 
 /**
+ * This is the contact list filter. A customized filter for the application
+ * adapter.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */

@@ -34,6 +34,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 /**
+ * This is an asynchronous task used to generate calendar events and reminders
+ * for checked contacts.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */
@@ -61,16 +64,14 @@ public class GenerateRemindersAsyncTask extends
 	private int countUpdate;
 	private int countDelete;
 
-	public GenerateRemindersAsyncTask(Responder responder,
-				Contact... contacts) {
-			this.responder = responder;
-			this.contacts = contacts;
-			generated = new ArrayList<ContactEvent>();
-			application = (MainApplication) responder
-					.getApplication();
-			applicationPreferences = application.getApplicationPreferences();
-			calendarUtils = application.getCalendarUtils();
-		}
+	public GenerateRemindersAsyncTask(Responder responder, Contact... contacts) {
+		this.responder = responder;
+		this.contacts = contacts;
+		generated = new ArrayList<ContactEvent>();
+		application = (MainApplication) responder.getApplication();
+		applicationPreferences = application.getApplicationPreferences();
+		calendarUtils = application.getCalendarUtils();
+	}
 
 	/**
 	 * Method invoked on the background thread.
@@ -253,8 +254,7 @@ public class GenerateRemindersAsyncTask extends
 		}
 
 		if (saveType != CalendarUtils.SaveType.NOTHING) {
-			saveType = calendarUtils
-					.saveEventReminder(contact, contactEvent);
+			saveType = calendarUtils.saveEventReminder(contact, contactEvent);
 		}
 
 		if (saveType == CalendarUtils.SaveType.NOTHING) {

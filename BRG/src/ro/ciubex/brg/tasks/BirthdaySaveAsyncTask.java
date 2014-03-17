@@ -48,6 +48,9 @@ public class BirthdaySaveAsyncTask extends AsyncTask<Void, Void, Boolean> {
 	private Contact mContact;
 	private Responder mResponder;
 
+	/**
+	 * Responder used on save process.
+	 */
 	public interface Responder {
 		public void saveProcessResult(boolean result);
 	}
@@ -60,16 +63,18 @@ public class BirthdaySaveAsyncTask extends AsyncTask<Void, Void, Boolean> {
 		this.mContact = contact;
 	}
 
+	/**
+	 * Method invoked on the background thread.
+	 */
 	@Override
 	protected Boolean doInBackground(Void... params) {
 		boolean result = doSaveBirthday(mApplication.getContentResolver());
 		return Boolean.valueOf(result);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+	/**
+	 * Method invoked on the UI thread after the background computation
+	 * finishes.
 	 */
 	@Override
 	protected void onPostExecute(Boolean result) {

@@ -50,6 +50,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 /**
+ * This is main activity class.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */
@@ -157,6 +159,9 @@ public class MainActivity extends Activity implements
 		}
 	}
 
+	/**
+	 * Method used to initialize the application fragments.
+	 */
 	private void prepareFragments() {
 		fragments = new Fragment[4];
 		fragments[FRG_CNT_LIST] = new ContactsListFragment();
@@ -188,6 +193,13 @@ public class MainActivity extends Activity implements
 		}
 	}
 
+	/**
+	 * Initialize the contents of the Activity's standard options menu.
+	 * 
+	 * @param menu
+	 *            The options menu in which you place your items.
+	 * @return True for the menu to be displayed.
+	 */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -195,6 +207,14 @@ public class MainActivity extends Activity implements
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	/**
+	 * This hook is called whenever an item in your options menu is selected.
+	 * 
+	 * @param item
+	 *            The menu item that was selected.
+	 * @return Return false to allow normal menu processing to proceed, true to
+	 *         consume it here.
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// toggle nav drawer on selecting action bar app icon/title
@@ -221,12 +241,20 @@ public class MainActivity extends Activity implements
 		}
 	}
 
+	/**
+	 * Call this when the activity should be closed.
+	 */
 	private void doExit() {
 		finish();
 	}
 
-	/* *
-	 * Called when invalidateOptionsMenu() is triggered
+	/**
+	 * Prepare the Screen's standard options menu to be displayed.
+	 * 
+	 * @param menu
+	 *            The options menu as last shown or first initialized by
+	 *            onCreateOptionsMenu().
+	 * @return Return true for the menu to be displayed.
 	 */
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
@@ -271,6 +299,12 @@ public class MainActivity extends Activity implements
 		}
 	}
 
+	/**
+	 * Change the title associated with this activity.
+	 * 
+	 * @param title
+	 *            The activity title to be showed.
+	 */
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
@@ -288,16 +322,21 @@ public class MainActivity extends Activity implements
 		mDrawerToggle.syncState();
 	}
 
+	/**
+	 * Called by the system when the device configuration changes while your
+	 * activity is running.
+	 * 
+	 * @param The
+	 *            new device configuration.
+	 */
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onBackPressed()
+	/**
+	 * Called when the activity has detected the user's press of the back key.
 	 */
 	@Override
 	public void onBackPressed() {

@@ -36,6 +36,8 @@ import android.database.Cursor;
 import android.net.Uri;
 
 /**
+ * This is an utility class used to work with phone calendar.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */

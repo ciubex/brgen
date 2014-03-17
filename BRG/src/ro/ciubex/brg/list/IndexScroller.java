@@ -32,6 +32,8 @@ import android.widget.ListView;
 import android.widget.SectionIndexer;
 
 /**
+ * This is the right alphabetically bar, used for fast scrolling.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */
@@ -68,6 +70,12 @@ public class IndexScroller {
 		mPreviewPadding = 5 * mDensity;
 	}
 
+	/**
+	 * Draw the control on the canvas.
+	 * 
+	 * @param canvas
+	 *            Canvas used for drawing
+	 */
 	public void draw(Canvas canvas) {
 		if (mState == STATE_HIDDEN)
 			return;
@@ -136,6 +144,13 @@ public class IndexScroller {
 		}
 	}
 
+	/**
+	 * Handling touch events
+	 * 
+	 * @param ev
+	 *            The motion events used to handle touch events
+	 * @return Boolean value if the events is handled or not.
+	 */
 	public boolean onTouchEvent(MotionEvent ev) {
 		switch (ev.getAction()) {
 		case MotionEvent.ACTION_DOWN:
@@ -178,6 +193,18 @@ public class IndexScroller {
 		return false;
 	}
 
+	/**
+	 * Called when the control should handle new dimensions.
+	 * 
+	 * @param w
+	 *            The new control width.
+	 * @param h
+	 *            The new control height.
+	 * @param oldw
+	 *            Old control width.
+	 * @param oldh
+	 *            Old control height.
+	 */
 	public void onSizeChanged(int w, int h, int oldw, int oldh) {
 		mListViewWidth = w;
 		mListViewHeight = h;
@@ -185,6 +212,9 @@ public class IndexScroller {
 				mIndexbarMargin, w - mIndexbarMargin, h - mIndexbarMargin);
 	}
 
+	/**
+	 * Showing the alphabetically bar.
+	 */
 	public void show() {
 		if (mState == STATE_HIDDEN)
 			setState(STATE_SHOWING);
@@ -192,11 +222,20 @@ public class IndexScroller {
 			setState(STATE_HIDING);
 	}
 
+	/**
+	 * Hide the alphabetically bar.
+	 */
 	public void hide() {
 		if (mState == STATE_SHOWN)
 			setState(STATE_HIDING);
 	}
 
+	/**
+	 * Set the list adapter used on the scroll navigation.
+	 * 
+	 * @param adapter
+	 *            The list adapter.
+	 */
 	public void setAdapter(Adapter adapter) {
 		if (adapter instanceof SectionIndexer) {
 			mIndexer = (SectionIndexer) adapter;
@@ -204,6 +243,12 @@ public class IndexScroller {
 		}
 	}
 
+	/**
+	 * Set the state for the alphabetically scroll bar.
+	 * 
+	 * @param state
+	 *            The state to be set.
+	 */
 	private void setState(int state) {
 		if (state < STATE_HIDDEN || state > STATE_HIDING)
 			return;
@@ -231,6 +276,15 @@ public class IndexScroller {
 		}
 	}
 
+	/**
+	 * Check if the specified position is on the scroll bar area.
+	 * 
+	 * @param x
+	 *            The x position to be checked.
+	 * @param y
+	 *            The y position to be checked.
+	 * @return True if the position is inside of the scroll bar.
+	 */
 	private boolean contains(float x, float y) {
 		// Determine if the point is in index bar region, which includes the
 		// right margin of the bar
@@ -238,6 +292,13 @@ public class IndexScroller {
 				+ mIndexbarRect.height());
 	}
 
+	/**
+	 * Obtain the section for a specified y position.
+	 * 
+	 * @param y
+	 *            The specified y position.
+	 * @return The secton for specified y position.
+	 */
 	private int getSectionByPoint(float y) {
 		if (mSections == null || mSections.length == 0)
 			return 0;
@@ -249,6 +310,12 @@ public class IndexScroller {
 				.height() - 2 * mIndexbarMargin) / mSections.length));
 	}
 
+	/**
+	 * Handle fading effect.
+	 * 
+	 * @param delay
+	 *            Delay of fade effect.
+	 */
 	private void fade(long delay) {
 		mHandler.removeMessages(0);
 		mHandler.sendEmptyMessageAtTime(0, SystemClock.uptimeMillis() + delay);
