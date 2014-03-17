@@ -21,7 +21,6 @@ package ro.ciubex.brg.fragment;
 import ro.ciubex.brg.MainActivity;
 import ro.ciubex.brg.MainApplication;
 import ro.ciubex.brg.R;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
@@ -42,16 +41,16 @@ public abstract class BaseFragment extends Fragment {
 	public BaseFragment() {
 	}
 
-	public void setMainApplication(MainApplication mainApplication) {
-		this.mApplication = mainApplication;
-	}
-
-	public void setMainActivity(MainActivity mainActivity) {
-		this.mActivity = mainActivity;
-	}
-	
-	public Activity getMainActivity() {
-		return mActivity;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Fragment#onCreate(android.os.Bundle)
+	 */
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		mActivity = (MainActivity) getActivity();
+		mApplication = (MainApplication) mActivity.getApplication();
 	}
 
 	/*

@@ -68,6 +68,17 @@ public class MainApplication extends Application {
 	}
 
 	/**
+	 * Obtain an array of contacts from the list.
+	 * 
+	 * @return An array of contacts.
+	 */
+	public Contact[] getContactsAsArray() {
+		Contact[] contacts = new Contact[mContacts.size()];
+		contacts = mContacts.toArray(contacts);
+		return contacts;
+	}
+
+	/**
 	 * Retrieve default application locale
 	 * 
 	 * @return Default locale used on application

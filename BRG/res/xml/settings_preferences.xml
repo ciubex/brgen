@@ -79,5 +79,29 @@
             android:summary="@string/str_when_end"
             android:title="@string/str_reminderEndTime" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/backup_restore_settings" >
+        <PreferenceScreen
+            android:summary="@string/backup_restore_settings_desc"
+            android:title="@string/backup_restore_settings" >
+            <PreferenceCategory android:title="@string/backup_settings" >
+                <ro.ciubex.brg.form.CustomEditTextPreference
+                    android:defaultValue="@string/default_backup_path"
+                    android:key="preferencesBackup"
+                    android:summary="@string/backup_desc"
+                    android:title="@string/backup" />
+                <ro.ciubex.brg.form.CustomEditTextPreference
+                    android:defaultValue="@string/default_backup_path"
+                    android:key="preferencesRestore"
+                    android:summary="@string/restore_desc"
+                    android:title="@string/restore" />
+
+                <Preference
+                    android:key="preferencesReset"
+                    android:persistent="false"
+                    android:summary="@string/reset_settings_desc"
+                    android:title="@string/reset_settings" />
+            </PreferenceCategory>
+        </PreferenceScreen>
+    </PreferenceCategory>
 
 </PreferenceScreen>

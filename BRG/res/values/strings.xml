@@ -21,6 +21,7 @@
     <string name="no_birthdays">Your contacts do not contain birthdays</string>
     <string name="birthdays_loaded">Were loaded %d birthdays</string>
     <string name="no_calendar">No access to any calendar to generate reminders.</string>
+    <string name="select_a_calendar">Select a calendar from settings first!</string>
     <string name="reminder_deleted">Deleted one reminder.</string>
     <string name="reminders_deleted">Deleted %d reminders.</string>
     <string name="reminder_inserted">Inserted one reminder.</string>
@@ -163,7 +164,31 @@
     <string name="enable_fast_scroll">Enable fast scroll</string>
     <string name="enable_fast_scroll_desc">Enable contact list fast scroll (restart app required)</string>
 
-    <string name="about_text"><Data><![CDATA[
+    <!-- Backup and restore -->
+    <string name="backup_restore_settings">Backup, restore or reset settings</string>
+    <string name="backup_restore_settings_desc">Backup, restore or reset applications settings</string>
+    <string name="backup_settings">Backup settings</string>
+    <string name="backup">Backup</string>
+    <string name="backup_desc">Backup application settings</string>
+    <string name="restore">Restore</string>
+    <string name="restore_desc">Restore application settings</string>
+    <string name="default_backup_path">/mnt/sdcard/brg.prefs</string>
+    <string name="reset_settings">Reset settings</string>
+    <string name="reset_settings_desc">Reset all settings</string>
+    <string name="reset_settings_question">Do you reset your settings?</string>
+    <string name="file_name_missing">You have not specitied a file name for the operation!</string>
+    <string name="export_started">Preferences exporting started!</string>
+    <string name="export_success">Successfully exported to: %s!</string>
+    <string name="export_exception">Exception ocured during exporting: %1$s\nException: %2$s\nMessage: %3$s</string>
+    <string name="create_folders_error">Cannot create parent folders: %s</string>
+    <string name="import_file_not_exist">Importing file: %s don\'t exist!\nCreate it first!</string>
+    <string name="import_started">Preferences importing started!</string>
+    <string name="import_success">Successfully imported from: %s!</string>
+    <string name="import_exception">Exception ocured during importing:  %1$s Exception: %2$s Message: %3$s</string>
+
+    <!-- About -->
+    <string name="about_text"><Data>
+<![CDATA[
         <b>Application version: %s</b><br/>
         This application will scan your contacts from phonebook for birthdays. You cand use this application to add and edit contact birthdays and to generate bithday reminders.<br/>
         The application was tested only with google contacts and calendars.<br/>
@@ -174,11 +199,12 @@
         This application use Treetog ArtWork\'s free icons from: <a href="http://www.iconarchive.com/artist/treetog.html">www.iconarchive.com</a>.<br/>
         The sources of this application are stored at: <a href="https://code.google.com/p/brgen/">https://code.google.com/p/brgen/</a>.</br>
         <br/>
-        Thank you for using this application!<br/>]]></Data></string>
-        
+        Thank you for using this application!<br/>]]>
+</Data></string>
+
     <!-- License -->
     <string name="license">License</string>
-    
+
     <!-- Donation -->
     <string name="donate">Donate</string>
     <string name="donate_title">Donation confirmation</string>
