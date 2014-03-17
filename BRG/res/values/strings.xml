@@ -55,6 +55,7 @@
         <item>Edit Birthday</item>
         <item>Remove Birthday</item>
         <item>Contact</item>
+        <item>(Re)Generate reminder</item>
     </string-array>
 
     <!-- Slide Menu Items -->

@@ -275,7 +275,8 @@ public class ContactsListFragment extends BaseFragment implements
 		mListView.setAdapter(mAdapter);
 		mListView.invalidateViews();
 		mListView.scrollBy(0, 0);
-		mListView.setFastScrollEnabled(mApplication.getApplicationPreferences().isEnabledFastScroll());
+		mListView.setFastScrollEnabled(mApplication.getApplicationPreferences()
+				.isEnabledFastScroll());
 	}
 
 	@Override
@@ -305,6 +306,9 @@ public class ContactsListFragment extends BaseFragment implements
 							break;
 						case 2:
 							editContact(contactPosition);
+							break;
+						case 3:
+							regenerateReminder(contactPosition);
 							break;
 						}
 					}
@@ -359,6 +363,23 @@ public class ContactsListFragment extends BaseFragment implements
 							+ contact.getId());
 			intent.setData(lookUpUri);
 			startActivityForResult(intent, REQUEST_CODE_CONTACT_EDITOR);
+		}
+	}
+
+	/**
+	 * (Re)Generate the reminder for selected contact.
+	 * 
+	 * @param contactPosition
+	 */
+	private void regenerateReminder(int contactPosition) {
+		Contact contact = mAdapter.getItem(contactPosition);
+		if (contact != null) {
+			if (contact.haveBirthday()) {
+				mActivity.generateReminders(contact);
+			} else {
+				mApplication.showMessageError(mActivity,
+						R.string.no_birthday_for, contact.getContactName());
+			}
 		}
 	}
 

@@ -28,6 +28,7 @@ import ro.ciubex.brg.fragment.ContactsListFragment;
 import ro.ciubex.brg.fragment.LicenseFragment;
 import ro.ciubex.brg.fragment.SettingsFragment;
 import ro.ciubex.brg.model.Constants;
+import ro.ciubex.brg.model.Contact;
 import ro.ciubex.brg.model.SlideMenuItem;
 import ro.ciubex.brg.tasks.DefaultAsyncTaskResult;
 import ro.ciubex.brg.tasks.GenerateRemindersAsyncTask;
@@ -203,7 +204,7 @@ public class MainActivity extends Activity implements
 		// Handle action bar actions click
 		switch (item.getItemId()) {
 		case R.id.action_generate:
-			generateReminders();
+			generateReminders((Contact[]) mApplication.getContacts().toArray());
 			return true;
 		case R.id.action_reload:
 			((ContactsListFragment) fragments[FRG_CNT_LIST])
@@ -313,9 +314,8 @@ public class MainActivity extends Activity implements
 	 * Create thread to generate reminders, based on the selected contacts from
 	 * the main list
 	 */
-	private void generateReminders() {
-		new GenerateRemindersAsyncTask(this, mApplication.getContacts())
-				.execute();
+	public void generateReminders(Contact... contacts) {
+		new GenerateRemindersAsyncTask(this, contacts).execute();
 	}
 
 	/**
