@@ -28,6 +28,8 @@ import android.provider.ContactsContract;
 import android.widget.BaseAdapter;
 
 /**
+ * An AsyncTask used to load birthday's for all contacts.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */
@@ -43,6 +45,9 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 		contentResolver = application.getContentResolver();
 	}
 
+	/**
+	 * Method invoked on the background thread.
+	 */
 	@Override
 	protected Boolean doInBackground(Void... params) {
 		for (Contact contact : application.getContacts()) {
@@ -62,10 +67,8 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 		return Boolean.TRUE;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.os.AsyncTask#onProgressUpdate(Progress[])
+	/**
+	 * This method is used to update the UI during this thread.
 	 */
 	@Override
 	protected void onProgressUpdate(Long... values) {

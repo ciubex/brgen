@@ -33,6 +33,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
+ * This class define left slide menu list adapter.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */
@@ -45,41 +47,52 @@ public class SlideMenuListAdapter extends BaseAdapter {
 		this.menuItems = menuItems;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * This is returning the menu items count.
 	 * 
-	 * @see android.widget.Adapter#getCount()
+	 * @return The menu items count.
 	 */
 	@Override
 	public int getCount() {
 		return menuItems.size();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * This method is returning a menu item from a specified position.
 	 * 
-	 * @see android.widget.Adapter#getItem(int)
+	 * @param position
+	 *            The specified position from the menu.
 	 */
 	@Override
 	public Object getItem(int position) {
 		return menuItems.get(position);
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get the row id associated with the specified position in the list. In
+	 * this case the position is also the id.
 	 * 
-	 * @see android.widget.Adapter#getItemId(int)
+	 * @param position
+	 *            The position in the list.
+	 * @return The position in the list.
 	 */
 	@Override
 	public long getItemId(int position) {
 		return position;
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Get a View that displays the data at the specified position in the data
+	 * set.
 	 * 
-	 * @see android.widget.Adapter#getView(int, android.view.View,
-	 * android.view.ViewGroup)
+	 * @param position
+	 *            The position of the item within the adapter's data set of the
+	 *            item whose view we want.
+	 * @param view
+	 *            The old view to reuse, if possible.
+	 * @param parent
+	 *            The parent that this view will eventually be attached to.
+	 * @return A View corresponding to the data at the specified position.
 	 */
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {

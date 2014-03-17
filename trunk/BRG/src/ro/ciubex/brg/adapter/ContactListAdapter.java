@@ -40,6 +40,8 @@ import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 /**
+ * This adaptor is used to handle the contact list view
+ * 
  * @author Claudiu Ciobotariu
  * 
  */
@@ -281,7 +283,8 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 			}
 			viewHolder.firstItemText.setText(contact.getContactName());
 			if (contact.haveBirthday()) {
-				viewHolder.secondItemText.setText(mApplication.getAge(contact.getBirthday()));
+				viewHolder.secondItemText.setText(mApplication.getAge(contact
+						.getBirthday()));
 				viewHolder.thirdItemText.setText(mApplication
 						.getFormattedCalendar(contact.getBirthday()));
 				viewHolder.imageCheckBox

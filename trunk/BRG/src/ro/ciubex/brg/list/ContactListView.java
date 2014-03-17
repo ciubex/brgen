@@ -27,6 +27,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 /**
+ * A customized list view with an alphabetically fast scroll on the right.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */
@@ -66,6 +68,10 @@ public class ContactListView extends ListView {
 		}
 	}
 
+	/**
+	 * Method used to paint the list view. Call the right alphabetically bar
+	 * drawing.
+	 */
 	@Override
 	public void draw(Canvas canvas) {
 		super.draw(canvas);
@@ -75,6 +81,9 @@ public class ContactListView extends ListView {
 			mScroller.draw(canvas);
 	}
 
+	/**
+	 * Handle touch events on the list.
+	 */
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
 		// Intercept ListView's touch event
@@ -102,11 +111,17 @@ public class ContactListView extends ListView {
 		return super.onTouchEvent(ev);
 	}
 
+	/**
+	 * Announce the system about touch events handling.
+	 */
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent ev) {
 		return true;
 	}
 
+	/**
+	 * Set the list view adapter.
+	 */
 	@Override
 	public void setAdapter(ListAdapter adapter) {
 		super.setAdapter(adapter);
@@ -114,6 +129,9 @@ public class ContactListView extends ListView {
 			mScroller.setAdapter(adapter);
 	}
 
+	/**
+	 * Intercept size changes. Let change the right scrollbar too.
+	 */
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);

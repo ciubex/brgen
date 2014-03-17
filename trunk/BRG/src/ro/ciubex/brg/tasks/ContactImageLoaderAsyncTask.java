@@ -33,6 +33,8 @@ import android.provider.ContactsContract;
 import android.widget.BaseAdapter;
 
 /**
+ * An AsyncTask used to load contacts pictures.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */
@@ -41,13 +43,16 @@ public class ContactImageLoaderAsyncTask extends
 
 	private ContentResolver contentResolver;
 	private BaseAdapter adapter;
-	
+
 	public ContactImageLoaderAsyncTask(Application application,
 			BaseAdapter adapter) {
 		this.adapter = adapter;
 		contentResolver = application.getContentResolver();
 	}
 
+	/**
+	 * Method invoked on the background thread.
+	 */
 	@Override
 	protected Boolean doInBackground(Contact... contacts) {
 		Boolean flag = Boolean.FALSE;
@@ -63,10 +68,9 @@ public class ContactImageLoaderAsyncTask extends
 		return flag;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+	/**
+	 * Method invoked on the UI thread after the background computation
+	 * finishes.
 	 */
 	@Override
 	protected void onPostExecute(Boolean result) {
