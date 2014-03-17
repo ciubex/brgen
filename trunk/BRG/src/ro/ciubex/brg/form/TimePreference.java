@@ -50,6 +50,8 @@ public class TimePreference extends DialogPreference implements
 	private static Logger logger = Logger.getLogger(TimePreference.class
 			.getName());
 	/** The widget for picking a time */
+	private Context mContext;
+	private AttributeSet mAttributes;
 	private TimePicker timePicker;
 	private TextView timeDisplay;
 	private boolean is24HourFormat;
@@ -74,6 +76,8 @@ public class TimePreference extends DialogPreference implements
 	 */
 	public TimePreference(Context context, AttributeSet attributes) {
 		super(context, attributes);
+		mContext = context;
+		mAttributes = attributes;
 		setPersistent(false);
 		is24HourFormat = DateFormat.is24HourFormat(context);
 
@@ -109,7 +113,7 @@ public class TimePreference extends DialogPreference implements
 	 */
 	@Override
 	protected View onCreateDialogView() {
-		timePicker = new TimePicker(getContext().getApplicationContext());
+		timePicker = new TimePicker(mContext, mAttributes);
 		timePicker.setOnTimeChangedListener(this);
 		return (timePicker);
 	}

@@ -23,7 +23,6 @@ import java.util.List;
 
 import ro.ciubex.brg.adapter.SlideMenuListAdapter;
 import ro.ciubex.brg.fragment.AboutFragment;
-import ro.ciubex.brg.fragment.BaseFragment;
 import ro.ciubex.brg.fragment.ContactsListFragment;
 import ro.ciubex.brg.fragment.LicenseFragment;
 import ro.ciubex.brg.fragment.SettingsFragment;
@@ -168,16 +167,6 @@ public class MainActivity extends Activity implements
 		fragments[FRG_SETTINGS] = new SettingsFragment();
 		fragments[FRG_ABOUT] = new AboutFragment();
 		fragments[FRG_LICENSE] = new LicenseFragment();
-
-		((BaseFragment) fragments[FRG_CNT_LIST])
-				.setMainApplication(mApplication);
-		((BaseFragment) fragments[FRG_ABOUT]).setMainApplication(mApplication);
-		((BaseFragment) fragments[FRG_LICENSE])
-				.setMainApplication(mApplication);
-
-		((BaseFragment) fragments[FRG_CNT_LIST]).setMainActivity(this);
-		((BaseFragment) fragments[FRG_ABOUT]).setMainActivity(this);
-		((BaseFragment) fragments[FRG_LICENSE]).setMainActivity(this);
 	}
 
 	/**
@@ -224,7 +213,7 @@ public class MainActivity extends Activity implements
 		// Handle action bar actions click
 		switch (item.getItemId()) {
 		case R.id.action_generate:
-			generateReminders((Contact[]) mApplication.getContacts().toArray());
+			generateReminders(mApplication.getContactsAsArray());
 			return true;
 		case R.id.action_reload:
 			((ContactsListFragment) fragments[FRG_CNT_LIST])
@@ -354,7 +343,11 @@ public class MainActivity extends Activity implements
 	 * the main list
 	 */
 	public void generateReminders(Contact... contacts) {
-		new GenerateRemindersAsyncTask(this, contacts).execute();
+		if (mApplication.getApplicationPreferences().haveCalendarSelected()) {
+			new GenerateRemindersAsyncTask(this, contacts).execute();
+		} else {
+			mApplication.showMessageError(this, R.string.select_a_calendar);
+		}
 	}
 
 	/**

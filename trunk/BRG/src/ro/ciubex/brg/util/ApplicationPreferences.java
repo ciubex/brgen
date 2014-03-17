@@ -18,6 +18,8 @@
  */
 package ro.ciubex.brg.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +30,7 @@ import ro.ciubex.brg.model.ReminderTime;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 
 /**
@@ -38,9 +41,11 @@ import android.preference.PreferenceManager;
  */
 public class ApplicationPreferences {
 	private static final String CONTACT_EVENTS = "contactEvents";
+	private static final String BACKUP_PATH = "backupPath";
 	private Application application;
 	private SharedPreferences sharedPreferences;
 	private Locale defaultLocale;
+	private String defaultBackupPath;
 
 	/**
 	 * The main constructor used to initialize the application preferences.
@@ -366,5 +371,54 @@ public class ApplicationPreferences {
 			list.remove(index);
 			setContactEvents(list);
 		}
+	}
+	
+	/**
+	 * Retrieve default backup path for exported application preferences file.
+	 * 
+	 * @return Default backup path.
+	 */
+	public String getDefaultBackupPath() {
+		if (defaultBackupPath == null) {
+			File defaultDir = Environment.getExternalStorageDirectory();
+			if (defaultDir != null && defaultDir.exists()) {
+				try {
+					defaultBackupPath = defaultDir.getCanonicalPath()
+							+ File.pathSeparator;
+				} catch (IOException e) {
+					defaultBackupPath = "";
+				}
+			} else {
+				defaultBackupPath = "";
+			}
+		}
+		return defaultBackupPath;
+	}
+
+	/**
+	 * Retrieve the importing path for the exported application preferences
+	 * file.
+	 * 
+	 * @return Importing backup path.
+	 */
+	public String getBackupPath() {
+		String defaultPath = "";
+
+		defaultPath += application.getString(R.string.default_backup_path);
+		return sharedPreferences.getString(BACKUP_PATH, defaultPath);
+	}
+
+	/**
+	 * Store the backup path for exporting or importing application preferences
+	 * file.
+	 * 
+	 * @param backupPath
+	 *            Path used for exporting or importing application preferences
+	 *            file.
+	 */
+	public void setBackupPath(String backupPath) {
+		Editor editor = sharedPreferences.edit();
+		editor.putString(BACKUP_PATH, backupPath);
+		editor.commit();
 	}
 }

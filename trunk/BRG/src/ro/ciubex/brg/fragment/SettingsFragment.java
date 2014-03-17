@@ -20,10 +20,18 @@ package ro.ciubex.brg.fragment;
 
 import java.util.List;
 
+import ro.ciubex.brg.MainActivity;
 import ro.ciubex.brg.MainApplication;
 import ro.ciubex.brg.R;
+import ro.ciubex.brg.form.CustomEditTextPreference;
+import ro.ciubex.brg.model.Constants;
 import ro.ciubex.brg.model.GoogleCalendar;
+import ro.ciubex.brg.tasks.DefaultAsyncTaskResult;
+import ro.ciubex.brg.tasks.PreferencesFileUtilAsynkTask;
 import ro.ciubex.brg.util.CalendarUtils;
+import android.app.AlertDialog;
+import android.app.Application;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -40,9 +48,19 @@ import android.preference.PreferenceManager;
  * 
  */
 public class SettingsFragment extends PreferenceFragment implements
-		OnSharedPreferenceChangeListener {
+		OnSharedPreferenceChangeListener, CustomEditTextPreference.Listener,
+		PreferencesFileUtilAsynkTask.Responder {
 	private MainApplication mApplication;
+	private MainActivity mActivity;
 	private ListPreference mCalendarList;
+	private CustomEditTextPreference preferencesBackup;
+	private CustomEditTextPreference preferencesRestore;
+	private static final int PREF_BACKUP = 1;
+	private static final int PREF_RESTORE = 2;
+
+	public void setMainActivity(MainActivity mainActivity) {
+		this.mActivity = mainActivity;
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -53,9 +71,43 @@ public class SettingsFragment extends PreferenceFragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.settings_preferences);
-		mApplication = (MainApplication) getActivity().getApplication();
+		mActivity = (MainActivity) getActivity();
+		mApplication = (MainApplication) mActivity.getApplication();
 		mCalendarList = (ListPreference) findPreference("calendarList");
+		prepareAllCustomEditTextPreference();
+		preparePreferencesReset();
 		populateAvailableCalendars();
+	}
+
+	/**
+	 * Prepare some custom preferences to not be stored. The preference backup
+	 * and restore are actually used as buttons.
+	 */
+	private void prepareAllCustomEditTextPreference() {
+		String backupPath = getBackupPath();
+		preferencesBackup = (CustomEditTextPreference) findPreference("preferencesBackup");
+		preferencesBackup.setResultListener(this, PREF_BACKUP);
+		preferencesBackup.setPersistent(false);
+		preferencesBackup.setText(backupPath);
+		preferencesRestore = (CustomEditTextPreference) findPreference("preferencesRestore");
+		preferencesRestore.setResultListener(this, PREF_RESTORE);
+		preferencesRestore.setPersistent(false);
+		preferencesRestore.setText(backupPath);
+	}
+
+	/**
+	 * Prepare reset preference handler
+	 */
+	private void preparePreferencesReset() {
+		Preference preferencesReset = (Preference) findPreference("preferencesReset");
+		preferencesReset
+				.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+					@Override
+					public boolean onPreferenceClick(Preference preference) {
+						return onPreferencesReset();
+					}
+				});
 	}
 
 	/**
@@ -156,5 +208,175 @@ public class SettingsFragment extends PreferenceFragment implements
 			ListPreference pref = (ListPreference) obj;
 			pref.setSummary((String) pref.getEntry());
 		}
+	}
+
+	/**
+	 * Persist into preferences the full file and path of saved or loaded
+	 * preferences
+	 * 
+	 * @param backupPath
+	 *            The full file and path of saved or loaded preferences
+	 */
+	private void storeBackupPath(String backupPath) {
+		mApplication.getApplicationPreferences().setBackupPath(backupPath);
+	}
+
+	/**
+	 * Obtain the full file and path of saved or loaded preferences
+	 * 
+	 * @return The full file and path of saved or loaded preferences
+	 */
+	private String getBackupPath() {
+		return mApplication.getApplicationPreferences().getBackupPath();
+	}
+
+	/**
+	 * Method invoked when is pressed the positive (OK) button from a preference
+	 * edit dialog
+	 * 
+	 * @param resultId
+	 *            The id of pressed preference: PREF_RESTORE or PREF_BACKUP
+	 * @param value
+	 *            The full file and path of saved or loaded preferences
+	 */
+	@Override
+	public void onPositiveResult(int resultId, String value) {
+		if (resultId > 0) {
+			storeBackupPath(value);
+		}
+		if (resultId == PREF_RESTORE) {
+			preferencesBackup.setText(value);
+			onRestorePreferences(value);
+		} else if (resultId == PREF_BACKUP) {
+			preferencesRestore.setText(value);
+			onBackupPreferences(value);
+		}
+	}
+
+	/**
+	 * Method invoked when is pressed the negative (Cancel) button from a
+	 * preference edit dialog
+	 * 
+	 * @param resultId
+	 *            The id of pressed preference: PREF_RESTORE or PREF_BACKUP
+	 * @param value
+	 *            The full file and path of saved or loaded preferences
+	 */
+	@Override
+	public void onNegativeResult(int resultId, String value) {
+
+	}
+
+	/**
+	 * Method invoked when is pressed the restore preference This will launch a
+	 * PreferencesFileUtilAsynkTask task to import preferences
+	 * 
+	 * @param backupPath
+	 *            The full file and path from where should be loaded preferences
+	 */
+	private void onRestorePreferences(String backupPath) {
+		new PreferencesFileUtilAsynkTask(this, backupPath,
+				PreferencesFileUtilAsynkTask.Operation.IMPORT).execute();
+	}
+
+	/**
+	 * Method invoked when is pressed the back-up preference This will launch
+	 * PreferencesFileUtilAsynkTask task to export preferences
+	 * 
+	 * @param backupPath
+	 *            The full file and path where should be stored preferences
+	 */
+	private void onBackupPreferences(String backupPath) {
+		new PreferencesFileUtilAsynkTask(this, backupPath,
+				PreferencesFileUtilAsynkTask.Operation.EXPORT).execute();
+	}
+
+	/**
+	 * Obtain main application.
+	 * 
+	 * @return Main application.
+	 */
+	@Override
+	public Application getApplication() {
+		return mApplication;
+	}
+
+	/**
+	 * Method invoked when is started PreferencesFileUtilAsynkTask task
+	 * 
+	 * @param operationType
+	 *            The operation type: import or export
+	 */
+	@Override
+	public void startFileAsynkTask(
+			PreferencesFileUtilAsynkTask.Operation operationType) {
+		if (operationType == PreferencesFileUtilAsynkTask.Operation.IMPORT) {
+			mApplication.showProgressDialog(mActivity, R.string.import_started);
+		} else {
+			mApplication.showProgressDialog(mActivity, R.string.export_started);
+		}
+	}
+
+	/**
+	 * Method invoked when is ended PreferencesFileUtilAsynkTask task
+	 * 
+	 * @param operationType
+	 *            The operation type: import or export
+	 * @param result
+	 *            The process result
+	 */
+	@Override
+	public void endFileAsynkTask(
+			PreferencesFileUtilAsynkTask.Operation operationType,
+			DefaultAsyncTaskResult result) {
+		mApplication.hideProgressDialog();
+		if (result.resultId == Constants.OK) {
+			mApplication.showMessageInfo(mActivity, result.resultMessage);
+			if (operationType == PreferencesFileUtilAsynkTask.Operation.IMPORT) {
+				// restartPreferencesActivity();
+			}
+		} else {
+			mApplication.showMessageError(mActivity, result.resultMessage);
+		}
+	}
+
+	/**
+	 * Method invoked to show a dialog to confirm preferences reset
+	 * 
+	 * @return Always true
+	 */
+	private boolean onPreferencesReset() {
+		new AlertDialog.Builder(mActivity)
+				.setTitle(R.string.app_name)
+				.setMessage(R.string.reset_settings_question)
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setPositiveButton(R.string.yes,
+						new DialogInterface.OnClickListener() {
+
+							public void onClick(DialogInterface dialog,
+									int whichButton) {
+								doPreferencesReset();
+							}
+						}).setNegativeButton(R.string.no, null).show();
+		return true;
+	}
+
+	/**
+	 * Method invoked to reset the preferences to default values
+	 */
+	private void doPreferencesReset() {
+		// Get this application SharedPreferences editor
+		SharedPreferences prefs = mApplication.getApplicationPreferences()
+				.getSharedPreferences();
+		SharedPreferences.Editor preferencesEditor = prefs.edit();
+		// Clear all the saved preference values.
+		preferencesEditor.clear();
+		// Commit all changes.
+		preferencesEditor.commit();
+		// Read the default values and set them as the current values.
+		mApplication.getApplicationPreferences().setDefaultValues(
+				R.xml.settings_preferences, true);
+
+		// restartPreferencesActivity();
 	}
 }
