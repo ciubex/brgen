@@ -51,7 +51,7 @@ public class GenerateRemindersAsyncTask extends
 		public void endGenerateReminders(DefaultAsyncTaskResult result);
 	}
 
-	private List<Contact> contacts;
+	private Contact[] contacts;
 	private List<ContactEvent> generated;
 	private Responder responder;
 	private MainApplication application;
@@ -62,7 +62,7 @@ public class GenerateRemindersAsyncTask extends
 	private int countDelete;
 
 	public GenerateRemindersAsyncTask(Responder responder,
-				List<Contact> contacts) {
+				Contact... contacts) {
 			this.responder = responder;
 			this.contacts = contacts;
 			generated = new ArrayList<ContactEvent>();

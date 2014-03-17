@@ -21,6 +21,7 @@ package ro.ciubex.brg.fragment;
 import ro.ciubex.brg.MainActivity;
 import ro.ciubex.brg.R;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -144,8 +145,10 @@ public class AboutFragment extends BaseFragment {
 	 */
 	private void startBrowserWithPage(int urlResourceId) {
 		String url = mApplication.getString(urlResourceId);
-		Intent i = new Intent(Intent.ACTION_VIEW);
-		i.setData(Uri.parse(url));
-		startActivity(i);
+		Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+		try {
+			startActivity(i);
+		} catch (ActivityNotFoundException exception) {
+		}
 	}
 }
