@@ -221,6 +221,7 @@ public class MainActivity extends Activity implements
 			return true;
 		case R.id.action_settings:
 			displayView(FRG_SETTINGS);
+			invalidateOptionsMenu();
 			return true;
 		case R.id.action_exit:
 			doExit();

@@ -189,17 +189,29 @@
     <!-- About -->
     <string name="about_text"><Data>
 <![CDATA[
-        <b>Application version: %s</b><br/>
-        This application will scan your contacts from phonebook for birthdays. You cand use this application to add and edit contact birthdays and to generate bithday reminders.<br/>
-        The application was tested only with google contacts and calendars.<br/>
-        When is started the application is loading all your available contacts, but the birthways and images are loaded in background and appear when are loaded in this time thsi application could become lagging.<br/>
-        Generated birthdays reminders are stored on your selected calendar, for each contact with a generated reminder a green checkbox appear on the right.<br/>
-        Unfortunately the application \"lose\" the generated reminders when is reinstaled, but generated reminders remain stored on the calendar, that\'s because the contacts and reminders will have different ID\'s and can not be identified by this application, I did not find a way to do that. So, if the user chose to generate reminders, then new ones will be regenerated.<br/>
-        <br/>
-        This application use Treetog ArtWork\'s free icons from: <a href="http://www.iconarchive.com/artist/treetog.html">www.iconarchive.com</a>.<br/>
-        The sources of this application are stored at: <a href="https://code.google.com/p/brgen/">https://code.google.com/p/brgen/</a>.</br>
-        <br/>
-        Thank you for using this application!<br/>]]>
+<b>Application version: %s</b><br/>
+<b>What this program do?</b><br/>
+<b>1.</b> This program scan your contacts from phonebook for birthdays.<br/>
+The contacts are displayed alphabetically on a list with:<br/>
+- contact photo;<br/>
+- contact name;<br/>
+- age;<br/>
+- birthday, you can change the date format from settings, property \"Display date format\", default format is Year-Month-Day \"yyyy-MM-dd\", you can use MM/dd/yyyy or others, google for: \"java SimpleDateFormat Patterns\".<br/>
+<b>2.</b> With this application you can add, edit and remove birthday information to a contact.<br/>
+<b>3.</b> You can generate a reminder on your favorite calendar based on the settings made. <b>Firstly you should select one</b> from settings, \"Select calendar for reminders\".<br/>
+See available reminder properties on the settings menu.<br/>
+<br/>
+<b>Note: This application is not a service, the reminders should be notified by your favorite calendar service!</b> So you should not worry about the RAM memory consumed by this application because you can close it after each use.<br/>
+<br/>
+<i>Observations:</i><br/>
+The application was tested only with google contacts and calendars.<br/>
+- When is started the application is loading all your available contacts, but the birthdays and images are loaded in background and appear when are loaded in this time this application could become lagging.<br/>
+Unfortunately the application \"lose\" the generated reminders when is reinstalled, but generated reminders remain stored on the calendar, that\'s because the contacts and reminders will have different ID\'s and can not be identified by this application, I did not find a way to do that. So, if the user chose to generate reminders, then new ones will be regenerated.<br/>
+<br/>
+This application use Treetog ArtWork\'s free icons from: <a href="http://www.iconarchive.com/artist/treetog.html">http://www.iconarchive.com/artist/treetog.html</a>.<br/>
+The sources of this application are stored at: <a href="https://code.google.com/p/brgen/">https://code.google.com/p/brgen/</a>.<br/>
+<br/>
+Thank you for using this application!<br/>]]>
 </Data></string>
 
     <!-- License -->
