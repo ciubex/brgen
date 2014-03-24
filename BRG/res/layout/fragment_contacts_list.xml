@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <ro.ciubex.brg.form.CustomEditText
+    <ro.ciubex.brgen.form.CustomEditText
         android:id="@+id/contacts_filter_box"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,7 +20,7 @@
         android:padding="2dip"
         android:text="@string/select_all" />
 
-    <ro.ciubex.brg.list.ContactListView
+    <ro.ciubex.brgen.list.ContactListView
         android:id="@+id/contacts_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

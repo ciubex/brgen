@@ -372,7 +372,7 @@ public class ApplicationPreferences {
 			setContactEvents(list);
 		}
 	}
-	
+
 	/**
 	 * Retrieve default backup path for exported application preferences file.
 	 * 
@@ -402,9 +402,16 @@ public class ApplicationPreferences {
 	 * @return Importing backup path.
 	 */
 	public String getBackupPath() {
+		String state = Environment.getExternalStorageState();
 		String defaultPath = "";
-
-		defaultPath += application.getString(R.string.default_backup_path);
+		if (Environment.MEDIA_MOUNTED.equals(state)
+				|| Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+			defaultPath += Environment.getExternalStorageDirectory().getPath()
+					+ File.separator;
+		} else {
+			defaultPath += application.getString(R.string.defaupt_backup_dir);
+		}
+		defaultPath += application.getString(R.string.default_backup_file);
 		return sharedPreferences.getString(BACKUP_PATH, defaultPath);
 	}
 

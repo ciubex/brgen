@@ -172,7 +172,8 @@
     <string name="backup_desc">Backup application settings</string>
     <string name="restore">Restore</string>
     <string name="restore_desc">Restore application settings</string>
-    <string name="default_backup_path">/mnt/sdcard/brg.prefs</string>
+    <string name="defaupt_backup_dir">/mnt/sdcard/</string>
+    <string name="default_backup_file">brg.prefs</string>
     <string name="reset_settings">Reset settings</string>
     <string name="reset_settings_desc">Reset all settings</string>
     <string name="reset_settings_question">Do you reset your settings?</string>
