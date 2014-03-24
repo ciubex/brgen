@@ -1,0 +1,24 @@
+BRG - Birthday Reminder Generator
+
+<b>What this program do?</b>
+<b>1.</b> This program scan your contacts from phonebook for birthdays.
+The contacts are displayed alphabetically on a list with:
+- contact photo;
+- contact name;
+- age;
+- birthday, you can change the date format from settings, property "Display date format", default format is Year-Month-Day "yyyy-MM-dd", you can use MM/dd/yyyy or others, google for: "java SimpleDateFormat Patterns".
+<b>2.</b> With this application you can add, edit and remove birthday information to a contact.
+<b>3.</b> You can generate a reminder on your favorite calendar based on the settings made. <b>Firstly you should select one</b> from settings, "Select calendar for reminders".
+See available reminder properties on the settings menu.
+
+<b>Note: This application is not a service, the reminders should be notified by your favorite calendar service!</b> So you should not worry about the RAM memory consumed by this application because you can close it after each use.
+
+<i>Observations:</i>
+The application was tested only with google contacts and calendars.
+- When is started the application is loading all your available contacts, but the birthdays and images are loaded in background and appear when are loaded in this time this application could become lagging.
+Unfortunately the application "lose" the generated reminders when is reinstalled, but generated reminders remain stored on the calendar, that's because the contacts and reminders will have different ID's and can not be identified by this application, I did not find a way to do that. So, if the user chose to generate reminders, then new ones will be regenerated.
+
+This application use Treetog ArtWork's free icons from: http://www.iconarchive.com/artist/treetog.html .
+The sources of this application are stored at: https://code.google.com/p/brgen/ .
+
+Thank you for using this application!
