@@ -62,7 +62,7 @@
             android:title="@string/str_isAllDay" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/time_title" >
-        <ro.ciubex.brg.form.TimePreference
+        <ro.ciubex.brgen.form.TimePreference
             android:defaultValue="@string/reminderStartTime"
             android:dependency="isAllDay"
             android:key="reminderStartTime"
@@ -70,7 +70,7 @@
             android:showDefault="true"
             android:summary="@string/str_when_start"
             android:title="@string/str_reminderStartTime" />
-        <ro.ciubex.brg.form.TimePreference
+        <ro.ciubex.brgen.form.TimePreference
             android:defaultValue="@string/reminderEndTime"
             android:dependency="isAllDay"
             android:key="reminderEndTime"
@@ -84,13 +84,13 @@
             android:summary="@string/backup_restore_settings_desc"
             android:title="@string/backup_restore_settings" >
             <PreferenceCategory android:title="@string/backup_settings" >
-                <ro.ciubex.brg.form.CustomEditTextPreference
-                    android:defaultValue="@string/default_backup_path"
+                <ro.ciubex.brgen.form.CustomEditTextPreference
+                    android:defaultValue="@string/default_backup_file"
                     android:key="preferencesBackup"
                     android:summary="@string/backup_desc"
                     android:title="@string/backup" />
-                <ro.ciubex.brg.form.CustomEditTextPreference
-                    android:defaultValue="@string/default_backup_path"
+                <ro.ciubex.brgen.form.CustomEditTextPreference
+                    android:defaultValue="@string/default_backup_file"
                     android:key="preferencesRestore"
                     android:summary="@string/restore_desc"
                     android:title="@string/restore" />
