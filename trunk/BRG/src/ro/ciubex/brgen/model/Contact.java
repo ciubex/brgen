@@ -36,7 +36,7 @@ public class Contact implements Comparable<Contact> {
 	private boolean checked;
 	private String contactName;
 	private Calendar birthday;
-	private boolean loadingBirthday;
+	private boolean loadedBirthday;
 	private Bitmap picture;
 	private boolean pictureLoaded;
 	private boolean pictureLoading;
@@ -129,12 +129,12 @@ public class Contact implements Comparable<Contact> {
 		return birthday != null;
 	}
 
-	public boolean isLoadingBirthday() {
-		return loadingBirthday;
+	public boolean isLoadedBirthday() {
+		return loadedBirthday;
 	}
 
-	public void setLoadingBirthday(boolean loadingBirthday) {
-		this.loadingBirthday = loadingBirthday;
+	public void setLoadedBirthday(boolean loadedBirthday) {
+		this.loadedBirthday = loadedBirthday;
 	}
 
 	/**

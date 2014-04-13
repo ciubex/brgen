@@ -52,8 +52,8 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 	protected Boolean doInBackground(Void... params) {
 		for (Contact contact : application.getContacts()) {
 			String birthday = null;
-			if (!contact.isLoadingBirthday()) {
-				contact.setLoadingBirthday(true);
+			if (!contact.isLoadedBirthday()) {
+				contact.setLoadedBirthday(true);
 				long contactId = contact.getId();
 				birthday = getContactBirthday(contentResolver, contactId);
 				if (birthday != null) {

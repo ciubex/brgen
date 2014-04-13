@@ -294,7 +294,11 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 				viewHolder.imageCheckBox
 						.setImageResource(R.drawable.checkbox_empty);
 				viewHolder.secondItemText.setText("");
-				viewHolder.thirdItemText.setText("");
+				if (!contact.isLoadedBirthday()) {
+					viewHolder.thirdItemText.setText(R.string.loading_wait);
+				} else {
+					viewHolder.thirdItemText.setText("");
+				}
 			}
 		}
 	}
