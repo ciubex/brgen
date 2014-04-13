@@ -409,7 +409,7 @@ public class ApplicationPreferences {
 			defaultPath += Environment.getExternalStorageDirectory().getPath()
 					+ File.separator;
 		} else {
-			defaultPath += application.getString(R.string.defaupt_backup_dir);
+			defaultPath += application.getString(R.string.default_backup_dir);
 		}
 		defaultPath += application.getString(R.string.default_backup_file);
 		return sharedPreferences.getString(BACKUP_PATH, defaultPath);
