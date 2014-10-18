@@ -48,13 +48,13 @@ import android.widget.TextView;
 public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	private MainApplication mApplication;
 	private LayoutInflater mInflater;
-	private Filter filter;
-	private Locale locale;
-	private List<Contact> contacts;
-	private List<ContactListItem> items;
-	private String mSections = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	private String[] sections;
-	private Map<String, Integer> indexes;
+	private Filter mFilter;
+	private Locale mLocale;
+	private List<Contact> mContacts;
+	private List<ContactListItem> mItems;
+	private String mSectionsChars = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	private String[] mSections;
+	private Map<String, Integer> mIndexes;
 
 	/**
 	 * Define item views type
@@ -69,10 +69,10 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 		mApplication = application;
 		mInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		this.contacts = contacts;
-		this.locale = locale;
-		items = new ArrayList<ContactListAdapter.ContactListItem>();
-		indexes = new HashMap<String, Integer>();
+		this.mContacts = contacts;
+		this.mLocale = locale;
+		mItems = new ArrayList<ContactListAdapter.ContactListItem>();
+		mIndexes = new HashMap<String, Integer>();
 		initListView(contacts);
 	}
 
@@ -93,32 +93,32 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 * Initialize the list indexes
 	 */
 	public void initIndexes() {
-		if (!indexes.isEmpty()) {
-			indexes.clear();
+		if (!mIndexes.isEmpty()) {
+			mIndexes.clear();
 		}
-		if (items.isEmpty()) {
-			sections = new String[1];
-			char key = mSections.charAt(0);
-			indexes.put("" + key, 0);
-			sections[0] = "" + key;
+		if (mItems.isEmpty()) {
+			mSections = new String[1];
+			char key = mSectionsChars.charAt(0);
+			mIndexes.put("" + key, 0);
+			mSections[0] = "" + key;
 		} else {
 			int s, i, idx = 0;
-			int size = mSections.length();
-			int count = items.size();
+			int size = mSectionsChars.length();
+			int count = mItems.size();
 			char key;
 			char sectionChar;
-			sections = new String[size];
+			mSections = new String[size];
 			for (s = 0; s < size; s++) {
-				key = mSections.charAt(s);
+				key = mSectionsChars.charAt(s);
 				for (i = idx; i < count; i++) {
-					sectionChar = items.get(i).sectionChar;
+					sectionChar = mItems.get(i).sectionChar;
 					if (key == sectionChar) {
 						idx = i;
 						break;
 					}
 				}
-				indexes.put("" + key, idx);
-				sections[s] = "" + key;
+				mIndexes.put("" + key, idx);
+				mSections[s] = "" + key;
 			}
 		}
 	}
@@ -127,7 +127,7 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 * Used to clear the list of items
 	 */
 	public void clear() {
-		items.clear();
+		mItems.clear();
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 */
 	@Override
 	public int getCount() {
-		return items.size();
+		return mItems.size();
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 */
 	@Override
 	public Contact getItem(int position) {
-		return items.get(position).contactModel;
+		return mItems.get(position).contactModel;
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 */
 	@Override
 	public View getView(int position, View view, ViewGroup parent) {
-		ContactListItem item = items.get(position);
+		ContactListItem item = mItems.get(position);
 		ContactsViewHolder viewHolder = null;
 		if (view != null) {
 			viewHolder = (ContactsViewHolder) view.getTag();
@@ -185,15 +185,18 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 				|| viewHolder.itemType != item.itemType) {
 			switch (item.itemType) {
 			case ITEM:
-				view = mInflater.inflate(R.layout.contact_item_layout, null);
+				view = mInflater.inflate(R.layout.contact_item_layout, parent,
+						false);
 				viewHolder = initItemView(view);
 				view.setTag(viewHolder);
 				break;
 			case SEPARATOR:
 				view = mInflater.inflate(R.layout.contact_separator_layout,
-						null);
+						parent, false);
 				viewHolder = initSeparatorView(view);
 				view.setTag(viewHolder);
+				break;
+			case UNUSED:
 				break;
 			}
 		}
@@ -204,6 +207,8 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 				break;
 			case SEPARATOR:
 				prepareSeparatorView(viewHolder, "" + item.sectionChar);
+				break;
+			case UNUSED:
 				break;
 			}
 		}
@@ -312,10 +317,10 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 */
 	@Override
 	public int getPositionForSection(int section) {
-		String key = sections[section];
+		String key = mSections[section];
 		int position = 0;
-		if (indexes.containsKey(key)) {
-			position = indexes.get(key);
+		if (mIndexes.containsKey(key)) {
+			position = mIndexes.get(key);
 		}
 		return position;
 	}
@@ -330,10 +335,10 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	@Override
 	public int getSectionForPosition(int position) {
 		int index = 0;
-		ContactListItem item = items.get(position);
+		ContactListItem item = mItems.get(position);
 		String key = "" + item.sectionChar;
-		if (indexes.containsKey(key)) {
-			index = indexes.get(key);
+		if (mIndexes.containsKey(key)) {
+			index = mIndexes.get(key);
 		}
 		return index;
 	}
@@ -345,7 +350,7 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 */
 	@Override
 	public Object[] getSections() {
-		return sections;
+		return mSections;
 	}
 
 	/**
@@ -355,7 +360,7 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 *            The contact model to be added to the adapter item list
 	 */
 	public void add(Contact item) {
-		items.add(prepareAdd(item));
+		mItems.add(prepareAdd(item));
 	}
 
 	/**
@@ -367,12 +372,12 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 */
 	private ContactListItem prepareAdd(Contact item) {
 		ContactListItem cItem = new ContactListItem(item);
-		if (items.isEmpty()) {
-			items.add(new ContactListItem(cItem.sectionChar));
+		if (mItems.isEmpty()) {
+			mItems.add(new ContactListItem(cItem.sectionChar));
 		} else {
-			ContactListItem lastItem = items.get(items.size() - 1);
+			ContactListItem lastItem = mItems.get(mItems.size() - 1);
 			if (lastItem == null || lastItem.sectionChar != cItem.sectionChar) {
-				items.add(new ContactListItem(cItem.sectionChar));
+				mItems.add(new ContactListItem(cItem.sectionChar));
 			}
 		}
 		return cItem;
@@ -384,9 +389,9 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 * @return Adapter customized filter
 	 */
 	public Filter getFilter() {
-		if (filter == null)
-			filter = new ContactListFilter(this, locale);
-		return filter;
+		if (mFilter == null)
+			mFilter = new ContactListFilter(this, mLocale);
+		return mFilter;
 	}
 
 	/**
@@ -395,7 +400,7 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
 	 * @return List of contact models
 	 */
 	public List<Contact> getContacts() {
-		return contacts;
+		return mContacts;
 	}
 
 	/**

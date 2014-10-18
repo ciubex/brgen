@@ -18,9 +18,6 @@
  */
 package ro.ciubex.brgen.form;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import ro.ciubex.brgen.util.Utilities;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -47,8 +44,6 @@ import android.widget.TimePicker;
  */
 public class TimePreference extends DialogPreference implements
 		TimePicker.OnTimeChangedListener {
-	private static Logger logger = Logger.getLogger(TimePreference.class
-			.getName());
 	/** The widget for picking a time */
 	private Context mContext;
 	private AttributeSet mAttributes;
@@ -282,8 +277,6 @@ public class TimePreference extends DialogPreference implements
 	public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
 		int currTime = (hourOfDay * 60) + minute;
 		boolean flag = (minTime < currTime && currTime < maxTime);
-		logger.log(Level.INFO, "onTimeChanged(" + hourOfDay + ":" + minute
-				+ "): " + flag);
 		setPositiveButtonEnabled(flag);
 	}
 

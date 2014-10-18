@@ -42,10 +42,10 @@ import android.preference.PreferenceManager;
 public class ApplicationPreferences {
 	private static final String CONTACT_EVENTS = "contactEvents";
 	private static final String BACKUP_PATH = "backupPath";
-	private Application application;
-	private SharedPreferences sharedPreferences;
-	private Locale defaultLocale;
-	private String defaultBackupPath;
+	private Application mApplication;
+	private SharedPreferences mSharedPreferences;
+	private Locale mDefaultLocale;
+	private String mDefaultBackupPath;
 
 	/**
 	 * The main constructor used to initialize the application preferences.
@@ -54,10 +54,10 @@ public class ApplicationPreferences {
 	 *            The birthday application.
 	 */
 	public ApplicationPreferences(Application application) {
-		this.application = application;
-		sharedPreferences = PreferenceManager
+		this.mApplication = application;
+		mSharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(application);
-		defaultLocale = Locale.getDefault();
+		mDefaultLocale = Locale.getDefault();
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class ApplicationPreferences {
 	 * @return
 	 */
 	public SharedPreferences getSharedPreferences() {
-		return sharedPreferences;
+		return mSharedPreferences;
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class ApplicationPreferences {
 	 * @return True if should be displayed alphabetically fast scroll.
 	 */
 	public boolean isEnabledFastScroll() {
-		return sharedPreferences.getBoolean("enableFastScroll", false);
+		return mSharedPreferences.getBoolean("enableFastScroll", false);
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class ApplicationPreferences {
 	 *            called in the past.
 	 */
 	public void setDefaultValues(int resId, boolean readAgain) {
-		PreferenceManager.setDefaultValues(application, resId, readAgain);
+		PreferenceManager.setDefaultValues(mApplication, resId, readAgain);
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class ApplicationPreferences {
 	 * @return The value stored on the shared preferences or a default value.
 	 */
 	private String getStringValue(String key, int defaultStringId) {
-		return getStringValue(key, application.getString(defaultStringId));
+		return getStringValue(key, mApplication.getString(defaultStringId));
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class ApplicationPreferences {
 	 * @return The value stored on the shared preferences or a default value.
 	 */
 	private String getStringValue(String key, String defaultValue) {
-		return sharedPreferences.getString(key, defaultValue);
+		return mSharedPreferences.getString(key, defaultValue);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class ApplicationPreferences {
 	 * @return Default application locale.
 	 */
 	public Locale getDefaultLocale() {
-		return defaultLocale;
+		return mDefaultLocale;
 	}
 
 	/**
@@ -134,8 +134,8 @@ public class ApplicationPreferences {
 	 * @return Reminder title format.
 	 */
 	public String getReminderTitleFormat() {
-		String defValue = application.getString(R.string.reminderTitleFormat);
-		return sharedPreferences.getString("reminderTitleFormat", defValue);
+		String defValue = mApplication.getString(R.string.reminderTitleFormat);
+		return mSharedPreferences.getString("reminderTitleFormat", defValue);
 	}
 
 	/**
@@ -156,9 +156,9 @@ public class ApplicationPreferences {
 	 * @return Reminder description format.
 	 */
 	public String getReminderDescriptionFormat() {
-		String defValue = application
+		String defValue = mApplication
 				.getString(R.string.reminderDescriptionFormat);
-		return sharedPreferences.getString("reminderDescriptionFormat",
+		return mSharedPreferences.getString("reminderDescriptionFormat",
 				defValue);
 	}
 
@@ -180,7 +180,7 @@ public class ApplicationPreferences {
 	 * @return Reminder type.
 	 */
 	public int getReminderType() {
-		String value = sharedPreferences.getString("reminderType", "1");
+		String value = mSharedPreferences.getString("reminderType", "1");
 		return Utilities.parseInt(value);
 	}
 
@@ -190,7 +190,7 @@ public class ApplicationPreferences {
 	 * @return Amount of time before event, in minutes.
 	 */
 	public int getReminderBefore() {
-		String value = sharedPreferences.getString("reminderBefore", "-1");
+		String value = mSharedPreferences.getString("reminderBefore", "-1");
 		return Utilities.parseInt(value);
 	}
 
@@ -200,7 +200,7 @@ public class ApplicationPreferences {
 	 * @return True if is an all day reminder.
 	 */
 	public boolean isAllDay() {
-		return sharedPreferences.getBoolean("isAllDay", false);
+		return mSharedPreferences.getBoolean("isAllDay", false);
 	}
 
 	/**
@@ -209,8 +209,8 @@ public class ApplicationPreferences {
 	 * @return String of reminder start time.
 	 */
 	public String getStringReminderStartTime() {
-		String defValue = application.getString(R.string.reminderStartTime);
-		return sharedPreferences.getString("reminderStartTime", defValue);
+		String defValue = mApplication.getString(R.string.reminderStartTime);
+		return mSharedPreferences.getString("reminderStartTime", defValue);
 	}
 
 	/**
@@ -228,8 +228,8 @@ public class ApplicationPreferences {
 	 * @return String of reminder end time.
 	 */
 	public String getStringReminderEndTime() {
-		String defValue = application.getString(R.string.reminderEndTime);
-		return sharedPreferences.getString("reminderEndTime", defValue);
+		String defValue = mApplication.getString(R.string.reminderEndTime);
+		return mSharedPreferences.getString("reminderEndTime", defValue);
 	}
 
 	/**
@@ -297,7 +297,7 @@ public class ApplicationPreferences {
 	 * @return Stored contact events list.
 	 */
 	public List<ContactEvent> getContactEvents() {
-		String stored = sharedPreferences.getString(CONTACT_EVENTS, "null");
+		String stored = mSharedPreferences.getString(CONTACT_EVENTS, "null");
 		List<ContactEvent> list = null;
 		if ("null".equals(stored)) {
 			list = new ArrayList<ContactEvent>(0);
@@ -324,7 +324,7 @@ public class ApplicationPreferences {
 	 *            List of contact events.
 	 */
 	public void setContactEvents(List<ContactEvent> list) {
-		Editor editor = sharedPreferences.edit();
+		Editor editor = mSharedPreferences.edit();
 		if (list.size() > 0) {
 			StringBuilder sb = new StringBuilder();
 			for (ContactEvent cem : list) {
@@ -379,20 +379,20 @@ public class ApplicationPreferences {
 	 * @return Default backup path.
 	 */
 	public String getDefaultBackupPath() {
-		if (defaultBackupPath == null) {
+		if (mDefaultBackupPath == null) {
 			File defaultDir = Environment.getExternalStorageDirectory();
 			if (defaultDir != null && defaultDir.exists()) {
 				try {
-					defaultBackupPath = defaultDir.getCanonicalPath()
+					mDefaultBackupPath = defaultDir.getCanonicalPath()
 							+ File.pathSeparator;
 				} catch (IOException e) {
-					defaultBackupPath = "";
+					mDefaultBackupPath = "";
 				}
 			} else {
-				defaultBackupPath = "";
+				mDefaultBackupPath = "";
 			}
 		}
-		return defaultBackupPath;
+		return mDefaultBackupPath;
 	}
 
 	/**
@@ -409,10 +409,10 @@ public class ApplicationPreferences {
 			defaultPath += Environment.getExternalStorageDirectory().getPath()
 					+ File.separator;
 		} else {
-			defaultPath += application.getString(R.string.default_backup_dir);
+			defaultPath += mApplication.getString(R.string.default_backup_dir);
 		}
-		defaultPath += application.getString(R.string.default_backup_file);
-		return sharedPreferences.getString(BACKUP_PATH, defaultPath);
+		defaultPath += mApplication.getString(R.string.default_backup_file);
+		return mSharedPreferences.getString(BACKUP_PATH, defaultPath);
 	}
 
 	/**
@@ -424,7 +424,7 @@ public class ApplicationPreferences {
 	 *            file.
 	 */
 	public void setBackupPath(String backupPath) {
-		Editor editor = sharedPreferences.edit();
+		Editor editor = mSharedPreferences.edit();
 		editor.putString(BACKUP_PATH, backupPath);
 		editor.commit();
 	}
