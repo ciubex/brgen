@@ -18,12 +18,10 @@
  */
 package ro.ciubex.brgen.util;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 /**
  * This is a birthday utilities class, used to obtain birthday ID and the
@@ -33,8 +31,7 @@ import android.provider.ContactsContract;
  * 
  */
 public class BirthdayDBUtils {
-	private static Logger logger = Logger.getLogger(BirthdayDBUtils.class
-			.getName());
+	private static final String TAG = BirthdayDBUtils.class.getName();
 
 	/**
 	 * Used to obtain the birthday event ID for a provided contact ID.
@@ -72,7 +69,7 @@ public class BirthdayDBUtils {
 				result = cursor.getLong(index);
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "getBirthdayEventId(" + contactId + ")", e);
+			Log.e(TAG, "getBirthdayEventId(" + contactId + ")", e);
 		} finally {
 			if (cursor != null && !cursor.isClosed()) {
 				cursor.close();
@@ -110,7 +107,7 @@ public class BirthdayDBUtils {
 				result = cursor.getLong(index);
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "getRawContactId(" + contactId + ")", e);
+			Log.e(TAG, "getRawContactId(" + contactId + ")", e);
 		} finally {
 			if (cursor != null && !cursor.isClosed()) {
 				cursor.close();

@@ -21,8 +21,6 @@ package ro.ciubex.brgen.util;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import ro.ciubex.brgen.MainApplication;
 import ro.ciubex.brgen.model.Contact;
@@ -34,6 +32,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * This is an utility class used to work with phone calendar.
@@ -42,11 +41,10 @@ import android.net.Uri;
  * 
  */
 public class CalendarUtils {
-	private static Logger logger = Logger.getLogger(CalendarUtils.class
-			.getName());
+	private static final String TAG = CalendarUtils.class.getName();
 	private MainApplication mApplication;
-	private ApplicationPreferences applicationPreferences;
-	private ContentResolver contentResolver;
+	private ApplicationPreferences mApplicationPreferences;
+	private ContentResolver mContentResolver;
 	private List<GoogleCalendar> mCalendars;
 	private boolean mCalendarSupported;
 	private String mCalendarUriBase;
@@ -57,7 +55,7 @@ public class CalendarUtils {
 
 	public CalendarUtils(MainApplication mApplication) {
 		this.mApplication = mApplication;
-		applicationPreferences = this.mApplication.getApplicationPreferences();
+		mApplicationPreferences = this.mApplication.getApplicationPreferences();
 		initCalendars();
 	}
 
@@ -66,13 +64,13 @@ public class CalendarUtils {
 	 */
 	public void initCalendars() {
 		mCalendars = new ArrayList<GoogleCalendar>();
-		contentResolver = mApplication.getContentResolver();
+		mContentResolver = mApplication.getContentResolver();
 		Cursor cursor = null;
 		String baseUri = "content://com.android.calendar/";
 		Uri calendarUri = null;
 		try {
 			calendarUri = Uri.parse(baseUri + "calendars");
-			cursor = contentResolver.query(calendarUri, new String[] { "_id",
+			cursor = mContentResolver.query(calendarUri, new String[] { "_id",
 					"calendar_displayName" }, null, null, null);
 			mCalendarUriBase = baseUri;
 		} catch (Exception e) {
@@ -81,7 +79,7 @@ public class CalendarUtils {
 			baseUri = "content://calendar/";
 			try {
 				calendarUri = Uri.parse(baseUri + "calendars");
-				cursor = contentResolver.query(calendarUri, new String[] {
+				cursor = mContentResolver.query(calendarUri, new String[] {
 						"_id", "displayName" }, null, null, null);
 				mCalendarUriBase = baseUri;
 			} catch (Exception e) {
@@ -141,17 +139,17 @@ public class CalendarUtils {
 		SaveType saveType = SaveType.NOTHING;
 		Calendar cal = contact.getBirthday();
 		ContentValues m = new ContentValues();
-		m.put("calendar_id", applicationPreferences.getCalendarSelected());
-		m.put("title", applicationPreferences.getReminderTitle(contact
+		m.put("calendar_id", mApplicationPreferences.getCalendarSelected());
+		m.put("title", mApplicationPreferences.getReminderTitle(contact
 				.getContactName()));
-		m.put("description", applicationPreferences
+		m.put("description", mApplicationPreferences
 				.getReminderDescription(contact.getContactName()));
 		m.put("eventLocation", "home");
 		m.put("eventStatus", 1);
-		m.put("allDay", applicationPreferences.isAllDay() ? 1 : 0);
+		m.put("allDay", mApplicationPreferences.isAllDay() ? 1 : 0);
 		m.put("eventTimezone", cal.getTimeZone().getID());
 
-		ReminderTime rtm = applicationPreferences.getReminderStartTime();
+		ReminderTime rtm = mApplicationPreferences.getReminderStartTime();
 
 		cal.set(Calendar.HOUR_OF_DAY, rtm.hour);
 		cal.set(Calendar.MINUTE, rtm.minute);
@@ -161,8 +159,8 @@ public class CalendarUtils {
 		m.put("rrule", "FREQ=YEARLY");
 
 		String duration = "P1D";
-		if (!applicationPreferences.isAllDay()) {
-			rtm = applicationPreferences.getReminderEndTime();
+		if (!mApplicationPreferences.isAllDay()) {
+			rtm = mApplicationPreferences.getReminderEndTime();
 			cal.set(Calendar.HOUR_OF_DAY, rtm.hour);
 			cal.set(Calendar.MINUTE, rtm.minute);
 			long endTime = cal.getTimeInMillis();
@@ -175,18 +173,26 @@ public class CalendarUtils {
 		boolean doInsert = true;
 		Uri uri = Uri.parse(mCalendarUriBase + "/events");
 		if (contactEvent.eventId > -1) {
-			Uri updateUri = ContentUris.withAppendedId(uri,
-					contactEvent.eventId);
-			int rows = contentResolver.update(updateUri, m, null, null);
-			doInsert = (rows == 0); // no row updated
-			saveType = SaveType.UPDATE;
+			try {
+				Uri updateUri = ContentUris.withAppendedId(uri,
+						contactEvent.eventId);
+				int rows = mContentResolver.update(updateUri, m, null, null);
+				doInsert = (rows == 0); // no row updated
+				saveType = (rows > 0) ? SaveType.UPDATE : SaveType.NOTHING;
+			} catch (Exception e) {
+				Log.e(TAG, "Update contact event: " + e.getMessage(), e);
+			}
 		}
 		if (doInsert) {
-			Uri eventUri = contentResolver.insert(uri, m);
-			contactEvent.eventId = Long
-					.parseLong(eventUri.getLastPathSegment());
-			saveType = SaveType.INSERT;
-			contact.setEventId(contactEvent.eventId);
+			try {
+				Uri eventUri = mContentResolver.insert(uri, m);
+				contactEvent.eventId = Long.parseLong(eventUri
+						.getLastPathSegment());
+				saveType = SaveType.INSERT;
+				contact.setEventId(contactEvent.eventId);
+			} catch (Exception e) {
+				Log.e(TAG, "Insert contact event: " + e.getMessage(), e);
+			}
 		}
 		return saveType;
 	}
@@ -204,26 +210,34 @@ public class CalendarUtils {
 		SaveType saveType = SaveType.NOTHING;
 		ContentValues m = new ContentValues();
 		m.put("event_id", contactEvent.eventId);
-		m.put("method", applicationPreferences.getReminderType()); // Reminders.METHOD_ALERT
-		m.put("minutes", applicationPreferences.getReminderBefore()); //
+		m.put("method", mApplicationPreferences.getReminderType()); // Reminders.METHOD_ALERT
+		m.put("minutes", mApplicationPreferences.getReminderBefore()); //
 
 		boolean doInsert = true;
 		Uri uri = Uri.parse(mCalendarUriBase + "/reminders");
-		cleanupRemindersForEvent(contentResolver, uri, contactEvent.eventId,
+		cleanupRemindersForEvent(mContentResolver, uri, contactEvent.eventId,
 				contactEvent.reminderId);
 		if (contactEvent.reminderId > -1) {
-			Uri updateUri = ContentUris.withAppendedId(uri,
-					contactEvent.reminderId);
-			int rows = contentResolver.update(updateUri, m, null, null);
-			doInsert = (rows == 0); // no row updated
-			saveType = SaveType.UPDATE;
+			try {
+				Uri updateUri = ContentUris.withAppendedId(uri,
+						contactEvent.reminderId);
+				int rows = mContentResolver.update(updateUri, m, null, null);
+				doInsert = (rows == 0); // no row updated
+				saveType = (rows > 0) ? SaveType.UPDATE : SaveType.NOTHING;
+			} catch (Exception e) {
+				Log.e(TAG, "Update event reminder: " + e.getMessage(), e);
+			}
 		}
 		if (doInsert) {
-			Uri eventUri = contentResolver.insert(uri, m);
-			contactEvent.reminderId = Long.parseLong(eventUri
-					.getLastPathSegment());
-			contact.setReminderId(contactEvent.reminderId);
-			saveType = SaveType.INSERT;
+			try {
+				Uri eventUri = mContentResolver.insert(uri, m);
+				contactEvent.reminderId = Long.parseLong(eventUri
+						.getLastPathSegment());
+				contact.setReminderId(contactEvent.reminderId);
+				saveType = SaveType.INSERT;
+			} catch (Exception e) {
+				Log.e(TAG, "Insert event reminder: " + e.getMessage(), e);
+			}
 		}
 		return saveType;
 	}
@@ -259,8 +273,7 @@ public class CalendarUtils {
 				}
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Querying uri:" + uri.toString() + " for:"
-					+ eventId, e);
+			Log.e(TAG, "Querying uri:" + uri.toString() + " for:" + eventId, e);
 			e.printStackTrace();
 		} finally {
 			if (cursor != null && !cursor.isClosed()) {
@@ -289,10 +302,11 @@ public class CalendarUtils {
 		if (entryId > -1) {
 			try {
 				Uri delUri = ContentUris.withAppendedId(uri, entryId);
-				contentResolver.delete(delUri, null, null);
+				mContentResolver.delete(delUri, null, null);
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Removing entryId:" + entryId
-						+ " uri:" + uri.toString(), e);
+				Log.e(TAG,
+						"Removing entryId:" + entryId + " uri:"
+								+ uri.toString(), e);
 			}
 		}
 	}

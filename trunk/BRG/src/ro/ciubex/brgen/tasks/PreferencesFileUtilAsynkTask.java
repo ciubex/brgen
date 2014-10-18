@@ -20,15 +20,12 @@ package ro.ciubex.brgen.tasks;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import ro.ciubex.brgen.MainApplication;
 import ro.ciubex.brgen.R;
@@ -47,8 +44,6 @@ import android.os.AsyncTask;
  */
 public class PreferencesFileUtilAsynkTask extends
 		AsyncTask<Void, Void, DefaultAsyncTaskResult> {
-	private static Logger logger = Logger
-			.getLogger(PreferencesFileUtilAsynkTask.class.getName());
 
 	/**
 	 * The listener should implement this interface
@@ -182,7 +177,6 @@ public class PreferencesFileUtilAsynkTask extends
 							.append(value).append('\n');
 				}
 				String content = sb.toString();
-				logger.log(Level.INFO, content);
 				fos.write(content.getBytes());
 				fos.flush();
 			} else {
@@ -227,13 +221,11 @@ public class PreferencesFileUtilAsynkTask extends
 		result.resultMessage = responder.getApplication().getString(
 				R.string.import_success, externalFileName);
 		MainApplication app = (MainApplication) responder.getApplication();
-		FileInputStream inFile = null;
+		BufferedReader reader = null;
 		try {
 			File f = new File(externalFileName);
 			if (f.exists()) {
-				inFile = new FileInputStream(f);
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(inFile));
+				reader = new BufferedReader(new FileReader(f));
 				SharedPreferences prefs = app.getApplicationPreferences()
 						.getSharedPreferences();
 				Editor editor = prefs.edit();
@@ -260,9 +252,9 @@ public class PreferencesFileUtilAsynkTask extends
 			result.resultMessage = app.getString(R.string.import_exception,
 					externalFileName, "IOException", e.getMessage());
 		} finally {
-			if (inFile != null) {
+			if (reader != null) {
 				try {
-					inFile.close();
+					reader.close();
 				} catch (IOException e) {
 					result.resultId = Constants.ERROR;
 					result.resultMessage = app.getString(
@@ -273,6 +265,14 @@ public class PreferencesFileUtilAsynkTask extends
 		}
 	}
 
+	/**
+	 * Private method to store on file a line of shared preferences.
+	 * 
+	 * @param editor
+	 *            Shared preferences editor.
+	 * @param arrLine
+	 *            Array with a line of stored shared information.
+	 */
 	private void storeCurrentLine(Editor editor, String[] arrLine) {
 		String key = arrLine[0], clazz = arrLine[1], value = arrLine[2];
 		int intValue;
@@ -295,9 +295,15 @@ public class PreferencesFileUtilAsynkTask extends
 		StringBuilder sb = new StringBuilder();
 		sb.append(key).append('+').append(clazz).append('+').append(value)
 				.append('\n');
-		logger.log(Level.INFO, sb.toString());
 	}
 
+	/**
+	 * Parse a string line to extract stored informations.
+	 * 
+	 * @param line
+	 *            A line with stored informations.
+	 * @return A string array with parsed data.
+	 */
 	private String[] currentLine(String line) {
 		String arr[] = null;
 		if (line != null) {

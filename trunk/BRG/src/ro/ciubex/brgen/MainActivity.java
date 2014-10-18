@@ -72,13 +72,13 @@ public class MainActivity extends Activity implements
 	private CharSequence mTitle;
 
 	// slide menu items
-	private String[] navMenuTitles;
-	private TypedArray navMenuIcons;
+	private String[] mNavMenuTitles;
+	private TypedArray mNavMenuIcons;
 
-	private List<SlideMenuItem> navDrawerItems;
-	private SlideMenuListAdapter adapter;
-	private Fragment[] fragments;
-	private ActionBar mainActionBar;
+	private List<SlideMenuItem> mNavDrawerItems;
+	private SlideMenuListAdapter mAdapter;
+	private Fragment[] mFragments;
+	private ActionBar mMainActionBar;
 	private int mFragmentIdCurrent;
 
 	@Override
@@ -90,45 +90,45 @@ public class MainActivity extends Activity implements
 		mTitle = mDrawerTitle = getTitle();
 
 		// load slide menu items
-		navMenuTitles = getResources().getStringArray(R.array.slide_menu_items);
+		mNavMenuTitles = getResources().getStringArray(R.array.slide_menu_items);
 
 		// nav drawer icons from resources
-		navMenuIcons = getResources()
+		mNavMenuIcons = getResources()
 				.obtainTypedArray(R.array.slide_menu_icons);
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
 
-		navDrawerItems = new ArrayList<SlideMenuItem>();
+		mNavDrawerItems = new ArrayList<SlideMenuItem>();
 
 		// adding nav drawer items to array
 		// Contact list
-		navDrawerItems.add(new SlideMenuItem(navMenuTitles[0], navMenuIcons
+		mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[0], mNavMenuIcons
 				.getResourceId(0, -1)));
 		// Settings
-		navDrawerItems.add(new SlideMenuItem(navMenuTitles[1], navMenuIcons
+		mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[1], mNavMenuIcons
 				.getResourceId(1, -1)));
 		// About
-		navDrawerItems.add(new SlideMenuItem(navMenuTitles[2], navMenuIcons
+		mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[2], mNavMenuIcons
 				.getResourceId(2, -1)));
 
 		// Recycle the typed array
-		navMenuIcons.recycle();
+		mNavMenuIcons.recycle();
 
-		mainActionBar = getActionBar();
+		mMainActionBar = getActionBar();
 
 		prepareFragments();
 
 		mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
 
 		// setting the nav drawer list adapter
-		adapter = new SlideMenuListAdapter(getApplicationContext(),
-				navDrawerItems);
-		mDrawerList.setAdapter(adapter);
+		mAdapter = new SlideMenuListAdapter(getApplicationContext(),
+				mNavDrawerItems);
+		mDrawerList.setAdapter(mAdapter);
 
 		// enabling action bar app icon and behaving it as toggle button
-		mainActionBar.setDisplayHomeAsUpEnabled(true);
-		mainActionBar.setHomeButtonEnabled(true);
+		mMainActionBar.setDisplayHomeAsUpEnabled(true);
+		mMainActionBar.setHomeButtonEnabled(true);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer, // nav menu toggle icon
@@ -138,13 +138,13 @@ public class MainActivity extends Activity implements
 									// accessibility
 		) {
 			public void onDrawerClosed(View view) {
-				mainActionBar.setTitle(mTitle);
+				mMainActionBar.setTitle(mTitle);
 				// calling onPrepareOptionsMenu() to show action bar icons
 				invalidateOptionsMenu();
 			}
 
 			public void onDrawerOpened(View drawerView) {
-				mainActionBar.setTitle(mDrawerTitle);
+				mMainActionBar.setTitle(mDrawerTitle);
 				// calling onPrepareOptionsMenu() to hide action bar icons
 				invalidateOptionsMenu();
 			}
@@ -162,11 +162,11 @@ public class MainActivity extends Activity implements
 	 * Method used to initialize the application fragments.
 	 */
 	private void prepareFragments() {
-		fragments = new Fragment[4];
-		fragments[FRG_CNT_LIST] = new ContactsListFragment();
-		fragments[FRG_SETTINGS] = new SettingsFragment();
-		fragments[FRG_ABOUT] = new AboutFragment();
-		fragments[FRG_LICENSE] = new LicenseFragment();
+		mFragments = new Fragment[4];
+		mFragments[FRG_CNT_LIST] = new ContactsListFragment();
+		mFragments[FRG_SETTINGS] = new SettingsFragment();
+		mFragments[FRG_ABOUT] = new AboutFragment();
+		mFragments[FRG_LICENSE] = new LicenseFragment();
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class MainActivity extends Activity implements
 			generateReminders(mApplication.getContactsAsArray());
 			return true;
 		case R.id.action_reload:
-			((ContactsListFragment) fragments[FRG_CNT_LIST])
+			((ContactsListFragment) mFragments[FRG_CNT_LIST])
 					.reloadContactList();
 			return true;
 		case R.id.action_settings:
@@ -263,11 +263,11 @@ public class MainActivity extends Activity implements
 	public void displayView(int position) {
 		// update the main content by replacing fragments
 		Fragment fragment = null;
-		if (position > -1 && position < fragments.length) {
-			fragment = fragments[position];
+		if (position > -1 && position < mFragments.length) {
+			fragment = mFragments[position];
 			mFragmentIdCurrent = position;
 		} else {
-			fragment = fragments[FRG_CNT_LIST];
+			fragment = mFragments[FRG_CNT_LIST];
 			mFragmentIdCurrent = FRG_CNT_LIST;
 		}
 
@@ -277,7 +277,7 @@ public class MainActivity extends Activity implements
 					.replace(R.id.frame_container, fragment).commit();
 
 			// update selected item and title, then close the drawer
-			setTitle(navMenuTitles[position]);
+			setTitle(mNavMenuTitles[position]);
 			if (mFragmentIdCurrent != FRG_LICENSE) {
 				mDrawerList.setItemChecked(position, true);
 				mDrawerList.setSelection(position);
@@ -298,7 +298,7 @@ public class MainActivity extends Activity implements
 	@Override
 	public void setTitle(CharSequence title) {
 		mTitle = title;
-		mainActionBar.setTitle(mTitle);
+		mMainActionBar.setTitle(mTitle);
 	}
 
 	/**

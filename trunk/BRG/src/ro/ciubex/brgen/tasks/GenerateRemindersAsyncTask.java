@@ -54,23 +54,23 @@ public class GenerateRemindersAsyncTask extends
 		public void endGenerateReminders(DefaultAsyncTaskResult result);
 	}
 
-	private Contact[] contacts;
-	private List<ContactEvent> generated;
-	private Responder responder;
-	private MainApplication application;
-	private ApplicationPreferences applicationPreferences;
-	private CalendarUtils calendarUtils;
-	private int countInsert;
-	private int countUpdate;
-	private int countDelete;
+	private Contact[] mContacts;
+	private List<ContactEvent> mGenerated;
+	private Responder mResponder;
+	private MainApplication mApplication;
+	private ApplicationPreferences mApplicationPreferences;
+	private CalendarUtils mCalendarUtils;
+	private int mCountInsert;
+	private int mCountUpdate;
+	private int mCountDelete;
 
 	public GenerateRemindersAsyncTask(Responder responder, Contact... contacts) {
-		this.responder = responder;
-		this.contacts = contacts;
-		generated = new ArrayList<ContactEvent>();
-		application = (MainApplication) responder.getApplication();
-		applicationPreferences = application.getApplicationPreferences();
-		calendarUtils = application.getCalendarUtils();
+		this.mResponder = responder;
+		this.mContacts = contacts;
+		mGenerated = new ArrayList<ContactEvent>();
+		mApplication = (MainApplication) responder.getApplication();
+		mApplicationPreferences = mApplication.getApplicationPreferences();
+		mCalendarUtils = mApplication.getCalendarUtils();
 	}
 
 	/**
@@ -79,13 +79,13 @@ public class GenerateRemindersAsyncTask extends
 	@Override
 	protected DefaultAsyncTaskResult doInBackground(Void... params) {
 		DefaultAsyncTaskResult result = new DefaultAsyncTaskResult();
-		ContentResolver cr = responder.getApplication().getContentResolver();
+		ContentResolver cr = mResponder.getApplication().getContentResolver();
 		result.resultId = Constants.OK;
-		if (calendarUtils.isCalendarSupported()) {
+		if (mCalendarUtils.isCalendarSupported()) {
 			generateReminders(cr, result);
 		} else {
 			result.resultId = Constants.ERROR;
-			result.resultMessage = responder.getApplication().getString(
+			result.resultMessage = mResponder.getApplication().getString(
 					R.string.no_calendar);
 		}
 		return result;
@@ -97,7 +97,7 @@ public class GenerateRemindersAsyncTask extends
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		responder.startGenerateReminders();
+		mResponder.startGenerateReminders();
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class GenerateRemindersAsyncTask extends
 	@Override
 	protected void onPostExecute(DefaultAsyncTaskResult result) {
 		super.onPostExecute(result);
-		responder.endGenerateReminders(result);
+		mResponder.endGenerateReminders(result);
 	}
 
 	/**
@@ -120,26 +120,26 @@ public class GenerateRemindersAsyncTask extends
 	 */
 	private void generateReminders(ContentResolver cr,
 			DefaultAsyncTaskResult result) {
-		Uri uriEvents = Uri.parse(calendarUtils.getCalendarUriBase()
+		Uri uriEvents = Uri.parse(mCalendarUtils.getCalendarUriBase()
 				+ "/events");
-		Uri uriReminders = Uri.parse(calendarUtils.getCalendarUriBase()
+		Uri uriReminders = Uri.parse(mCalendarUtils.getCalendarUriBase()
 				+ "/reminders");
-		countUpdate = 0;
-		countInsert = 0;
-		countDelete = 0;
-		for (Contact contact : contacts) {
+		mCountUpdate = 0;
+		mCountInsert = 0;
+		mCountDelete = 0;
+		for (Contact contact : mContacts) {
 			if (contact.haveBirthday()) {
 				if (contact.isChecked()) {
 					generateBirthdayReminderEvent(cr, contact);
 				} else {
 					if (contact.haveEvent()) {
-						countDelete++;
-						calendarUtils.deleteEntry(uriEvents,
+						mCountDelete++;
+						mCalendarUtils.deleteEntry(uriEvents,
 								contact.getEventId());
 						contact.setEventId(-1);
 					}
 					if (contact.haveReminder()) {
-						calendarUtils.deleteEntry(uriReminders,
+						mCalendarUtils.deleteEntry(uriReminders,
 								contact.getReminderId());
 						contact.setReminderId(-1);
 					}
@@ -158,22 +158,22 @@ public class GenerateRemindersAsyncTask extends
 	 *            The process result.
 	 */
 	private void generateResultMessages(DefaultAsyncTaskResult result) {
-		if (countInsert == 0 && countUpdate == 0 && countDelete == 0) {
-			String text = responder.getApplication().getString(
+		if (mCountInsert == 0 && mCountUpdate == 0 && mCountDelete == 0) {
+			String text = mResponder.getApplication().getString(
 					R.string.no_changes);
 			addToMessage(result, text);
 		} else {
-			if (countInsert > 0) {
+			if (mCountInsert > 0) {
 				generateResultMessage(result, R.string.reminder_inserted,
-						R.string.reminders_inserted, countInsert);
+						R.string.reminders_inserted, mCountInsert);
 			}
-			if (countUpdate > 0) {
+			if (mCountUpdate > 0) {
 				generateResultMessage(result, R.string.reminder_updated,
-						R.string.reminders_updated, countUpdate);
+						R.string.reminders_updated, mCountUpdate);
 			}
-			if (countDelete > 0) {
+			if (mCountDelete > 0) {
 				generateResultMessage(result, R.string.reminder_deleted,
-						R.string.reminders_deleted, countDelete);
+						R.string.reminders_deleted, mCountDelete);
 			}
 		}
 	}
@@ -195,9 +195,9 @@ public class GenerateRemindersAsyncTask extends
 			int stringIdSingular, int stringId, int count) {
 		String text = null;
 		if (count == 1) {
-			text = responder.getApplication().getString(stringIdSingular);
+			text = mResponder.getApplication().getString(stringIdSingular);
 		} else {
-			text = responder.getApplication().getString(stringId, count);
+			text = mResponder.getApplication().getString(stringId, count);
 		}
 		addToMessage(result, text);
 	}
@@ -223,7 +223,7 @@ public class GenerateRemindersAsyncTask extends
 	 * Save the generated reminder on application shared preferences.
 	 */
 	private void saveGeneratedReminders() {
-		applicationPreferences.setContactEvents(generated);
+		mApplicationPreferences.setContactEvents(mGenerated);
 	}
 
 	/**
@@ -246,21 +246,21 @@ public class GenerateRemindersAsyncTask extends
 
 		CalendarUtils.SaveType saveType;
 
-		saveType = calendarUtils.saveContactEvent(contact, contactEvent);
+		saveType = mCalendarUtils.saveContactEvent(contact, contactEvent);
 		if (saveType == CalendarUtils.SaveType.INSERT) {
-			countInsert++;
+			mCountInsert++;
 		} else if (saveType == CalendarUtils.SaveType.UPDATE) {
-			countUpdate++;
+			mCountUpdate++;
 		}
 
 		if (saveType != CalendarUtils.SaveType.NOTHING) {
-			saveType = calendarUtils.saveEventReminder(contact, contactEvent);
+			saveType = mCalendarUtils.saveEventReminder(contact, contactEvent);
 		}
 
 		if (saveType == CalendarUtils.SaveType.NOTHING) {
 			result = Constants.ERROR;
 		} else {
-			generated.add(contactEvent);
+			mGenerated.add(contactEvent);
 		}
 		return result;
 	}
