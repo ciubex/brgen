@@ -26,7 +26,9 @@ import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.tasks.BirthdayRemoveAsyncTask;
 import ro.ciubex.brgen.tasks.BirthdaysLoaderAsyncTask;
 import ro.ciubex.brgen.tasks.DefaultAsyncTaskResult;
+import ro.ciubex.brgen.tasks.GenerateRemindersAsyncTask;
 import ro.ciubex.brgen.tasks.LoadContactsAsyncTask;
+import ro.ciubex.brgen.tasks.SyncRemindersAsyncTask;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.DialogInterface;
@@ -49,7 +51,8 @@ import android.widget.ListView;
  * 
  */
 public class ContactsListFragment extends BaseFragment implements
-		LoadContactsAsyncTask.Responder, BirthdayRemoveAsyncTask.Responder {
+		LoadContactsAsyncTask.Responder, BirthdayRemoveAsyncTask.Responder,
+		GenerateRemindersAsyncTask.Responder, SyncRemindersAsyncTask.Responder {
 	private EditText mFilterBox = null;
 	private CheckedTextView mCheckedAll;
 	private ListView mListView = null;
@@ -57,6 +60,9 @@ public class ContactsListFragment extends BaseFragment implements
 	private DatePickerDialogFragment mDatePickerDlg;
 
 	private static final int REQUEST_CODE_CONTACT_EDITOR = 1;
+	private static final int CONFIRMATION_REMOVE_BIRTHDAY = 0;
+	private static final int CONFIRMATION_GEN_REMINDERS = 1;
+	private static final int CONFIRMATION_SYNC_REMINDERS = 2;
 
 	@Override
 	protected int getFragmentResourceId() {
@@ -378,11 +384,37 @@ public class ContactsListFragment extends BaseFragment implements
 		Contact contact = mAdapter.getItem(contactPosition);
 		if (contact != null) {
 			if (contact.haveBirthday()) {
-				mActivity.generateReminders(contact);
+				contact.setChecked(true);
+				new GenerateRemindersAsyncTask(this, mApplication, contact)
+						.execute();
 			} else {
 				mApplication.showMessageError(mActivity,
 						R.string.no_birthday_for, contact.getContactName());
 			}
+		}
+	}
+
+	/**
+	 * Method invoked when is started the generate reminders thread
+	 */
+	@Override
+	public void startGenerateReminders() {
+		mApplication.showProgressDialog(mActivity, R.string.generate_reminders);
+	}
+
+	/**
+	 * Method invoked at the end of generate reminders thread
+	 * 
+	 * @param result
+	 *            The process result
+	 */
+	@Override
+	public void endGenerateReminders(DefaultAsyncTaskResult result) {
+		mApplication.hideProgressDialog();
+		if (Constants.OK == result.resultId) {
+			mApplication.showMessageInfo(mActivity, result.resultMessage);
+		} else {
+			mApplication.showMessageError(mActivity, result.resultMessage);
 		}
 	}
 
@@ -406,22 +438,35 @@ public class ContactsListFragment extends BaseFragment implements
 	 *            Selected contact
 	 */
 	private void showRemoveContactBirthdayConfirmation(final Contact contact) {
-		new AlertDialog.Builder(mActivity)
-				.setIcon(android.R.drawable.ic_dialog_alert)
-				.setTitle(R.string.remove_contact_birthday_title)
-				.setMessage(
-						mApplication.getString(
-								R.string.remove_contact_birthday_question,
-								contact.getContactName()))
-				.setPositiveButton(R.string.yes,
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								doRemoveContactBirthday(contact);
-							}
+		showConfirmationDialog(R.string.remove_contact_birthday_title,
+				mApplication.getString(
+						R.string.remove_contact_birthday_question,
+						contact.getContactName()),
+				CONFIRMATION_REMOVE_BIRTHDAY, contact);
+	}
 
-						}).setNegativeButton(R.string.no, null).show();
+	/**
+	 * Method invoked when the used click on the OK confirmation dialog message.
+	 * 
+	 * @param confirmationId
+	 *            The ID of the message to be identified on the caller activity.
+	 * @param anObject
+	 *            The object used by the caller activity.
+	 */
+	@Override
+	protected void onConfirmationOk(int confirmationId, Object anObject) {
+		switch (confirmationId) {
+		case CONFIRMATION_REMOVE_BIRTHDAY:
+			doRemoveContactBirthday((Contact) anObject);
+			break;
+		case CONFIRMATION_GEN_REMINDERS:
+			new GenerateRemindersAsyncTask(this, mApplication,
+					mApplication.getContactsAsArray()).execute();
+			break;
+		case CONFIRMATION_SYNC_REMINDERS:
+			new SyncRemindersAsyncTask(this, mApplication, mAdapter).execute();
+			break;
+		}
 	}
 
 	/**
@@ -446,6 +491,57 @@ public class ContactsListFragment extends BaseFragment implements
 			showMessageDialog(R.string.error_occurred, mApplication.getString(
 					R.string.contact_birthday_not_removed,
 					contact.getContactName()), 0, null);
+		}
+	}
+
+	/**
+	 * Save reminders for selected contacts.
+	 */
+	public void saveReminders() {
+		if (mApplication.getApplicationPreferences().haveCalendarSelected()) {
+			showConfirmationDialog(R.string.generate_reminders_title,
+					mApplication
+							.getString(R.string.generate_reminders_question),
+					CONFIRMATION_GEN_REMINDERS, null);
+		} else {
+			mApplication
+					.showMessageError(mActivity, R.string.select_a_calendar);
+		}
+	}
+
+	/**
+	 * Synchronize local contacts with stored reminders.
+	 */
+	public void syncReminders() {
+		if (mApplication.getContacts().isEmpty()) {
+			mApplication.showMessageError(mActivity, R.string.no_contacts);
+		} else {
+			showConfirmationDialog(
+					R.string.sync_confirmation_title,
+					mApplication.getString(R.string.sync_confirmation_question),
+					CONFIRMATION_SYNC_REMINDERS, null);
+		}
+	}
+
+	/**
+	 * Method invoked when the synchronization is started.
+	 */
+	@Override
+	public void startSyncReminders() {
+		mApplication.showProgressDialog(mActivity, R.string.sync_in_progress);
+	}
+
+	/**
+	 * Method invoked when the synchronization is ended.
+	 */
+	@Override
+	public void endSyncReminders(DefaultAsyncTaskResult result) {
+		if (Constants.OK == result.resultId) {
+			mAdapter.notifyDataSetChanged();
+		}
+		mApplication.hideProgressDialog();
+		if (result.resultMessage != null) {
+			mApplication.showMessageInfo(mActivity, result.resultMessage);
 		}
 	}
 }

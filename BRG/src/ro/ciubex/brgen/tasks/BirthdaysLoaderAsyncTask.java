@@ -34,15 +34,15 @@ import android.widget.BaseAdapter;
  * 
  */
 public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
-	private MainApplication application;
-	private ContentResolver contentResolver;
-	private BaseAdapter adapter;
+	private MainApplication mApplication;
+	private ContentResolver mContentResolver;
+	private BaseAdapter mAdapter;
 
 	public BirthdaysLoaderAsyncTask(MainApplication application,
 			BaseAdapter adapter) {
-		this.application = application;
-		this.adapter = adapter;
-		contentResolver = application.getContentResolver();
+		this.mApplication = application;
+		this.mAdapter = adapter;
+		mContentResolver = application.getContentResolver();
 	}
 
 	/**
@@ -50,16 +50,16 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 	 */
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		for (Contact contact : application.getContacts()) {
+		for (Contact contact : mApplication.getContacts()) {
 			String birthday = null;
 			if (!contact.isLoadedBirthday()) {
 				contact.setLoadedBirthday(true);
 				long contactId = contact.getId();
-				birthday = getContactBirthday(contentResolver, contactId);
+				birthday = getContactBirthday(mContentResolver, contactId);
 				if (birthday != null) {
 					contact.setBirthday(Utilities.parseCalendarString(
-							application.getDefaultLocale(),
-							application.getDateFormat(), birthday));
+							mApplication.getDefaultLocale(),
+							mApplication.getDateFormat(), birthday));
 					publishProgress(contactId);
 				}
 			}
@@ -73,7 +73,7 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 	@Override
 	protected void onProgressUpdate(Long... values) {
 		super.onProgressUpdate(values);
-		adapter.notifyDataSetChanged();
+		mAdapter.notifyDataSetChanged();
 	}
 
 	/**

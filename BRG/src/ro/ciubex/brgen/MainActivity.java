@@ -26,11 +26,7 @@ import ro.ciubex.brgen.fragment.AboutFragment;
 import ro.ciubex.brgen.fragment.ContactsListFragment;
 import ro.ciubex.brgen.fragment.LicenseFragment;
 import ro.ciubex.brgen.fragment.SettingsFragment;
-import ro.ciubex.brgen.model.Constants;
-import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.model.SlideMenuItem;
-import ro.ciubex.brgen.tasks.DefaultAsyncTaskResult;
-import ro.ciubex.brgen.tasks.GenerateRemindersAsyncTask;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
@@ -54,9 +50,7 @@ import android.widget.ListView;
  * @author Claudiu Ciobotariu
  * 
  */
-public class MainActivity extends Activity implements
-		GenerateRemindersAsyncTask.Responder {
-	private MainApplication mApplication;
+public class MainActivity extends Activity {
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -84,17 +78,17 @@ public class MainActivity extends Activity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mApplication = (MainApplication) getApplication();
 		setContentView(R.layout.activity_main);
 
 		mTitle = mDrawerTitle = getTitle();
 
 		// load slide menu items
-		mNavMenuTitles = getResources().getStringArray(R.array.slide_menu_items);
+		mNavMenuTitles = getResources()
+				.getStringArray(R.array.slide_menu_items);
 
 		// nav drawer icons from resources
-		mNavMenuIcons = getResources()
-				.obtainTypedArray(R.array.slide_menu_icons);
+		mNavMenuIcons = getResources().obtainTypedArray(
+				R.array.slide_menu_icons);
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
@@ -213,7 +207,10 @@ public class MainActivity extends Activity implements
 		// Handle action bar actions click
 		switch (item.getItemId()) {
 		case R.id.action_generate:
-			generateReminders(mApplication.getContactsAsArray());
+			((ContactsListFragment) mFragments[FRG_CNT_LIST]).saveReminders();
+			return true;
+		case R.id.action_sync:
+			((ContactsListFragment) mFragments[FRG_CNT_LIST]).syncReminders();
 			return true;
 		case R.id.action_reload:
 			((ContactsListFragment) mFragments[FRG_CNT_LIST])
@@ -221,7 +218,9 @@ public class MainActivity extends Activity implements
 			return true;
 		case R.id.action_settings:
 			displayView(FRG_SETTINGS);
-			invalidateOptionsMenu();
+			return true;
+		case R.id.action_back:
+			displayView(FRG_CNT_LIST);
 			return true;
 		case R.id.action_exit:
 			doExit();
@@ -252,8 +251,12 @@ public class MainActivity extends Activity implements
 				mFragmentIdCurrent == FRG_CNT_LIST);
 		menu.findItem(R.id.action_generate).setVisible(
 				mFragmentIdCurrent == FRG_CNT_LIST);
+		menu.findItem(R.id.action_sync).setVisible(
+				mFragmentIdCurrent == FRG_CNT_LIST);
 		menu.findItem(R.id.action_reload).setVisible(
 				mFragmentIdCurrent == FRG_CNT_LIST);
+		menu.findItem(R.id.action_back).setVisible(
+				mFragmentIdCurrent != FRG_CNT_LIST);
 		return super.onPrepareOptionsMenu(menu);
 	}
 
@@ -283,6 +286,7 @@ public class MainActivity extends Activity implements
 				mDrawerList.setSelection(position);
 				mDrawerLayout.closeDrawer(mDrawerList);
 			}
+			invalidateOptionsMenu();
 		} else {
 			// error in creating fragment
 			Log.e("MainActivity", "Error in creating fragment");
@@ -336,42 +340,6 @@ public class MainActivity extends Activity implements
 			super.onBackPressed();
 		} else {
 			displayView(FRG_CNT_LIST);
-		}
-	}
-
-	/**
-	 * Create thread to generate reminders, based on the selected contacts from
-	 * the main list
-	 */
-	public void generateReminders(Contact... contacts) {
-		if (mApplication.getApplicationPreferences().haveCalendarSelected()) {
-			new GenerateRemindersAsyncTask(this, contacts).execute();
-		} else {
-			mApplication.showMessageError(this, R.string.select_a_calendar);
-		}
-	}
-
-	/**
-	 * Method invoked when is started the generate reminders thread
-	 */
-	@Override
-	public void startGenerateReminders() {
-		mApplication.showProgressDialog(this, R.string.generate_reminders);
-	}
-
-	/**
-	 * Method invoked at the end of generate reminders thread
-	 * 
-	 * @param result
-	 *            The process result
-	 */
-	@Override
-	public void endGenerateReminders(DefaultAsyncTaskResult result) {
-		mApplication.hideProgressDialog();
-		if (Constants.OK == result.resultId) {
-			mApplication.showMessageInfo(this, result.resultMessage);
-		} else {
-			mApplication.showMessageError(this, result.resultMessage);
 		}
 	}
 }

@@ -28,7 +28,6 @@ import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.model.ContactEvent;
 import ro.ciubex.brgen.util.ApplicationPreferences;
 import ro.ciubex.brgen.util.CalendarUtils;
-import android.app.Application;
 import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -47,8 +46,6 @@ public class GenerateRemindersAsyncTask extends
 	 * Responder used on generate process.
 	 */
 	public interface Responder {
-		public Application getApplication();
-
 		public void startGenerateReminders();
 
 		public void endGenerateReminders(DefaultAsyncTaskResult result);
@@ -64,11 +61,12 @@ public class GenerateRemindersAsyncTask extends
 	private int mCountUpdate;
 	private int mCountDelete;
 
-	public GenerateRemindersAsyncTask(Responder responder, Contact... contacts) {
+	public GenerateRemindersAsyncTask(Responder responder,
+			MainApplication application, Contact... contacts) {
 		this.mResponder = responder;
 		this.mContacts = contacts;
 		mGenerated = new ArrayList<ContactEvent>();
-		mApplication = (MainApplication) responder.getApplication();
+		mApplication = application;
 		mApplicationPreferences = mApplication.getApplicationPreferences();
 		mCalendarUtils = mApplication.getCalendarUtils();
 	}
@@ -79,14 +77,13 @@ public class GenerateRemindersAsyncTask extends
 	@Override
 	protected DefaultAsyncTaskResult doInBackground(Void... params) {
 		DefaultAsyncTaskResult result = new DefaultAsyncTaskResult();
-		ContentResolver cr = mResponder.getApplication().getContentResolver();
+		ContentResolver cr = mApplication.getContentResolver();
 		result.resultId = Constants.OK;
 		if (mCalendarUtils.isCalendarSupported()) {
 			generateReminders(cr, result);
 		} else {
 			result.resultId = Constants.ERROR;
-			result.resultMessage = mResponder.getApplication().getString(
-					R.string.no_calendar);
+			result.resultMessage = mApplication.getString(R.string.no_calendar);
 		}
 		return result;
 	}
@@ -159,8 +156,7 @@ public class GenerateRemindersAsyncTask extends
 	 */
 	private void generateResultMessages(DefaultAsyncTaskResult result) {
 		if (mCountInsert == 0 && mCountUpdate == 0 && mCountDelete == 0) {
-			String text = mResponder.getApplication().getString(
-					R.string.no_changes);
+			String text = mApplication.getString(R.string.no_changes);
 			addToMessage(result, text);
 		} else {
 			if (mCountInsert > 0) {
@@ -195,9 +191,9 @@ public class GenerateRemindersAsyncTask extends
 			int stringIdSingular, int stringId, int count) {
 		String text = null;
 		if (count == 1) {
-			text = mResponder.getApplication().getString(stringIdSingular);
+			text = mApplication.getString(stringIdSingular);
 		} else {
-			text = mResponder.getApplication().getString(stringId, count);
+			text = mApplication.getString(stringId, count);
 		}
 		addToMessage(result, text);
 	}
