@@ -47,7 +47,8 @@ public class CalendarUtils {
 	private ContentResolver mContentResolver;
 	private List<GoogleCalendar> mCalendars;
 	private boolean mCalendarSupported;
-	private String mCalendarUriBase;
+	private Uri mCalendarEvents;
+	private Uri mCalendarReminders;
 
 	public enum SaveType {
 		UPDATE, INSERT, NOTHING
@@ -68,11 +69,12 @@ public class CalendarUtils {
 		Cursor cursor = null;
 		String baseUri = "content://com.android.calendar/";
 		Uri calendarUri = null;
+		String calendarBaseUri = null;
 		try {
 			calendarUri = Uri.parse(baseUri + "calendars");
 			cursor = mContentResolver.query(calendarUri, new String[] { "_id",
 					"calendar_displayName" }, null, null, null);
-			mCalendarUriBase = baseUri;
+			calendarBaseUri = baseUri;
 		} catch (Exception e) {
 		}
 		if (cursor == null) {
@@ -81,7 +83,7 @@ public class CalendarUtils {
 				calendarUri = Uri.parse(baseUri + "calendars");
 				cursor = mContentResolver.query(calendarUri, new String[] {
 						"_id", "displayName" }, null, null, null);
-				mCalendarUriBase = baseUri;
+				calendarBaseUri = baseUri;
 			} catch (Exception e) {
 				cursor = null;
 			}
@@ -91,6 +93,10 @@ public class CalendarUtils {
 				GoogleCalendar gc = new GoogleCalendar(cursor.getLong(0),
 						cursor.getString(1));
 				mCalendars.add(gc);
+			}
+			if (calendarBaseUri != null) {
+				mCalendarEvents = Uri.parse(calendarBaseUri + "/events");
+				mCalendarReminders = Uri.parse(calendarBaseUri + "/reminders");
 			}
 		}
 		if (!mCalendars.isEmpty()) {
@@ -117,12 +123,21 @@ public class CalendarUtils {
 	}
 
 	/**
-	 * Obtain the calendars URI base.
+	 * Retrieve the calendar events URI.
 	 * 
-	 * @return the mCalendarUriBase
+	 * @return The calendar events URI.
 	 */
-	public String getCalendarUriBase() {
-		return mCalendarUriBase;
+	public Uri getCalendarEvents() {
+		return mCalendarEvents;
+	}
+
+	/**
+	 * Retrieve the calendar reminders URI.
+	 * 
+	 * @return The calendar reminders URI.
+	 */
+	public Uri getCalendarReminders() {
+		return mCalendarReminders;
 	}
 
 	/**
@@ -171,10 +186,9 @@ public class CalendarUtils {
 		m.put("hasAlarm", 1);
 
 		boolean doInsert = true;
-		Uri uri = Uri.parse(mCalendarUriBase + "/events");
 		if (contactEvent.eventId > -1) {
 			try {
-				Uri updateUri = ContentUris.withAppendedId(uri,
+				Uri updateUri = ContentUris.withAppendedId(mCalendarEvents,
 						contactEvent.eventId);
 				int rows = mContentResolver.update(updateUri, m, null, null);
 				doInsert = (rows == 0); // no row updated
@@ -185,7 +199,7 @@ public class CalendarUtils {
 		}
 		if (doInsert) {
 			try {
-				Uri eventUri = mContentResolver.insert(uri, m);
+				Uri eventUri = mContentResolver.insert(mCalendarEvents, m);
 				contactEvent.eventId = Long.parseLong(eventUri
 						.getLastPathSegment());
 				saveType = SaveType.INSERT;
@@ -195,6 +209,26 @@ public class CalendarUtils {
 			}
 		}
 		return saveType;
+	}
+
+	/**
+	 * Method used to remove an event.
+	 * 
+	 * @param eventId
+	 *            The event ID to be removed.
+	 */
+	public void removeEvent(long eventId) {
+		deleteEntry(mCalendarEvents, eventId);
+	}
+
+	/**
+	 * Method used to remove a reminder.
+	 * 
+	 * @param reminderId
+	 *            The reminder ID to be removed.
+	 */
+	public void removeReminder(long reminderId) {
+		deleteEntry(mCalendarReminders, reminderId);
 	}
 
 	/**
@@ -214,12 +248,11 @@ public class CalendarUtils {
 		m.put("minutes", mApplicationPreferences.getReminderBefore()); //
 
 		boolean doInsert = true;
-		Uri uri = Uri.parse(mCalendarUriBase + "/reminders");
-		cleanupRemindersForEvent(mContentResolver, uri, contactEvent.eventId,
-				contactEvent.reminderId);
+		cleanupRemindersForEvent(mContentResolver, mCalendarReminders,
+				contactEvent.eventId, contactEvent.reminderId);
 		if (contactEvent.reminderId > -1) {
 			try {
-				Uri updateUri = ContentUris.withAppendedId(uri,
+				Uri updateUri = ContentUris.withAppendedId(mCalendarReminders,
 						contactEvent.reminderId);
 				int rows = mContentResolver.update(updateUri, m, null, null);
 				doInsert = (rows == 0); // no row updated
@@ -230,7 +263,7 @@ public class CalendarUtils {
 		}
 		if (doInsert) {
 			try {
-				Uri eventUri = mContentResolver.insert(uri, m);
+				Uri eventUri = mContentResolver.insert(mCalendarReminders, m);
 				contactEvent.reminderId = Long.parseLong(eventUri
 						.getLastPathSegment());
 				contact.setReminderId(contactEvent.reminderId);

@@ -29,8 +29,8 @@ import ro.ciubex.brgen.model.ContactEvent;
 import ro.ciubex.brgen.util.ApplicationPreferences;
 import ro.ciubex.brgen.util.CalendarUtils;
 import android.content.ContentResolver;
-import android.net.Uri;
 import android.os.AsyncTask;
+import android.widget.BaseAdapter;
 
 /**
  * This is an asynchronous task used to generate calendar events and reminders
@@ -40,7 +40,7 @@ import android.os.AsyncTask;
  * 
  */
 public class GenerateRemindersAsyncTask extends
-		AsyncTask<Void, Void, DefaultAsyncTaskResult> {
+		AsyncTask<Void, Long, DefaultAsyncTaskResult> {
 
 	/**
 	 * Responder used on generate process.
@@ -55,6 +55,7 @@ public class GenerateRemindersAsyncTask extends
 	private List<ContactEvent> mGenerated;
 	private Responder mResponder;
 	private MainApplication mApplication;
+	private BaseAdapter mAdapter;
 	private ApplicationPreferences mApplicationPreferences;
 	private CalendarUtils mCalendarUtils;
 	private int mCountInsert;
@@ -62,11 +63,13 @@ public class GenerateRemindersAsyncTask extends
 	private int mCountDelete;
 
 	public GenerateRemindersAsyncTask(Responder responder,
-			MainApplication application, Contact... contacts) {
+			MainApplication application, BaseAdapter adapter,
+			Contact... contacts) {
 		this.mResponder = responder;
 		this.mContacts = contacts;
 		mGenerated = new ArrayList<ContactEvent>();
 		mApplication = application;
+		mAdapter = adapter;
 		mApplicationPreferences = mApplication.getApplicationPreferences();
 		mCalendarUtils = mApplication.getCalendarUtils();
 	}
@@ -98,6 +101,17 @@ public class GenerateRemindersAsyncTask extends
 	}
 
 	/**
+	 * This method is used to update the UI during this thread.
+	 */
+	@Override
+	protected void onProgressUpdate(Long... values) {
+		super.onProgressUpdate(values);
+		if (values[0] > 0L) {
+			mAdapter.notifyDataSetChanged();
+		}
+	}
+
+	/**
 	 * Method invoked on the UI thread after the background computation
 	 * finishes.
 	 */
@@ -117,30 +131,25 @@ public class GenerateRemindersAsyncTask extends
 	 */
 	private void generateReminders(ContentResolver cr,
 			DefaultAsyncTaskResult result) {
-		Uri uriEvents = Uri.parse(mCalendarUtils.getCalendarUriBase()
-				+ "/events");
-		Uri uriReminders = Uri.parse(mCalendarUtils.getCalendarUriBase()
-				+ "/reminders");
 		mCountUpdate = 0;
 		mCountInsert = 0;
 		mCountDelete = 0;
 		for (Contact contact : mContacts) {
-			if (contact.haveBirthday()) {
-				if (contact.isChecked()) {
-					generateBirthdayReminderEvent(cr, contact);
-				} else {
-					if (contact.haveEvent()) {
-						mCountDelete++;
-						mCalendarUtils.deleteEntry(uriEvents,
-								contact.getEventId());
-						contact.setEventId(-1);
-					}
-					if (contact.haveReminder()) {
-						mCalendarUtils.deleteEntry(uriReminders,
-								contact.getReminderId());
-						contact.setReminderId(-1);
-					}
+			if (contact.isChecked() && contact.haveBirthday()) {
+				generateBirthdayReminderEvent(cr, contact);
+			} else {
+				if (contact.haveEvent()) {
+					mCountDelete++;
+					publishProgress(1L);
+					mCalendarUtils.removeEvent(contact.getEventId());
+					contact.setEventId(-1);
 				}
+				if (contact.haveReminder()) {
+					mCalendarUtils.removeReminder(contact.getReminderId());
+					contact.setReminderId(-1);
+				}
+				contact.setChecked(false);
+				publishProgress(1L);
 			}
 		}
 		generateResultMessages(result);
@@ -235,6 +244,7 @@ public class GenerateRemindersAsyncTask extends
 	private int generateBirthdayReminderEvent(ContentResolver cr,
 			Contact contact) {
 		int result = Constants.OK;
+		boolean cntInsert = false, cntUpdate = false;
 		ContactEvent contactEvent = new ContactEvent();
 		contactEvent.contactId = contact.getId();
 		contactEvent.eventId = contact.getEventId();
@@ -244,9 +254,9 @@ public class GenerateRemindersAsyncTask extends
 
 		saveType = mCalendarUtils.saveContactEvent(contact, contactEvent);
 		if (saveType == CalendarUtils.SaveType.INSERT) {
-			mCountInsert++;
+			cntInsert = true;
 		} else if (saveType == CalendarUtils.SaveType.UPDATE) {
-			mCountUpdate++;
+			cntUpdate = true;
 		}
 
 		if (saveType != CalendarUtils.SaveType.NOTHING) {
@@ -255,8 +265,17 @@ public class GenerateRemindersAsyncTask extends
 
 		if (saveType == CalendarUtils.SaveType.NOTHING) {
 			result = Constants.ERROR;
+			if (cntInsert) {
+				mCalendarUtils.removeEvent(contactEvent.eventId);
+				contactEvent.eventId = -1;
+			}
 		} else {
-			mGenerated.add(contactEvent);
+			if (cntInsert || cntUpdate) {
+				mGenerated.add(contactEvent);
+				mCountInsert += cntInsert ? 1 : 0;
+				mCountUpdate += cntUpdate ? 1 : 0;
+				publishProgress(1L);
+			}
 		}
 		return result;
 	}

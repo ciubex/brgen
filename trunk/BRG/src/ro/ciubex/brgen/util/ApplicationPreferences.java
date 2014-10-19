@@ -265,14 +265,8 @@ public class ApplicationPreferences {
 	 * @return True if the calendar is selected.
 	 */
 	public boolean haveCalendarSelected() {
-		String value = getStringValue("calendarList", "none");
-		boolean result = false;
-		try {
-			Long.parseLong(value);
-			result = true;
-		} catch (NumberFormatException exception) {
-		}
-		return result;
+		long id = getCalendarSelected();
+		return id > -1L;
 	}
 
 	/**
@@ -281,8 +275,8 @@ public class ApplicationPreferences {
 	 * @return The selected calendar ID.
 	 */
 	public long getCalendarSelected() {
-		long id = 0L;
-		String value = getStringValue("calendarList", "none");
+		long id = -1L;
+		String value = getStringValue("calendarList", "-1");
 		try {
 			id = Long.parseLong(value);
 		} catch (NumberFormatException exception) {

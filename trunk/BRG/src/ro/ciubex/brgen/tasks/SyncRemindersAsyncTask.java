@@ -29,7 +29,6 @@ import ro.ciubex.brgen.model.ContactEvent;
 import ro.ciubex.brgen.util.ApplicationPreferences;
 import ro.ciubex.brgen.util.CalendarUtils;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.BaseAdapter;
@@ -154,7 +153,6 @@ public class SyncRemindersAsyncTask extends
 	private boolean syncContactEvents(CalendarUtils calendarUtils,
 			DefaultAsyncTaskResult result) {
 		boolean bool = true;
-		Uri uri = Uri.parse(calendarUtils.getCalendarUriBase() + "/events");
 		Cursor cursor = null;
 		String[] columns = new String[] { "calendar_id", "_id", "title",
 				"rrule", "hasAlarm" };
@@ -162,8 +160,9 @@ public class SyncRemindersAsyncTask extends
 				.getApplicationPreferences();
 		String selection = "calendar_id = " + preferences.getCalendarSelected();
 		try {
-			cursor = mApplication.getContentResolver().query(uri, columns,
-					selection, null, null);
+			cursor = mApplication.getContentResolver().query(
+					calendarUtils.getCalendarEvents(), columns, selection,
+					null, null);
 			if (cursor != null) {
 				while (cursor.moveToNext()) {
 					processCalendarEventsCursor(cursor, preferences);
@@ -199,7 +198,6 @@ public class SyncRemindersAsyncTask extends
 		if (hasAlarm == 1 && rrule != null && rrule.contains("FREQ=YEARLY")) {
 			for (Contact contact : mApplication.getContacts()) {
 				temp = preferences.getReminderTitle(contact.getContactName());
-				Log.d(TAG, "Match: [" + title + "] == [" + temp + "]");
 				if (temp.equals(title)) {
 					eventId = cursor.getLong(cursor.getColumnIndex("_id"));
 					contact.setEventId(eventId);
@@ -221,12 +219,12 @@ public class SyncRemindersAsyncTask extends
 	private boolean syncContactReminders(CalendarUtils calendarUtils,
 			DefaultAsyncTaskResult result) {
 		boolean bool = true;
-		Uri uri = Uri.parse(calendarUtils.getCalendarUriBase() + "/reminders");
 		Cursor cursor = null;
 		String[] columns = new String[] { "_id", "event_id", };
 		try {
-			cursor = mApplication.getContentResolver().query(uri, columns,
-					null, null, null);
+			cursor = mApplication.getContentResolver().query(
+					calendarUtils.getCalendarReminders(), columns, null, null,
+					null);
 			if (cursor != null) {
 				while (cursor.moveToNext()) {
 					processCalendarRemindersCursor(cursor);
