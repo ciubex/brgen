@@ -30,6 +30,8 @@ import ro.ciubex.brgen.util.Utilities;
 import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -39,6 +41,7 @@ import android.widget.Toast;
  * 
  */
 public class MainApplication extends Application {
+	private static final String TAG = MainApplication.class.getName();
 	private ApplicationPreferences mApplicationPreferences;
 	private CalendarUtils mCalendarUtils;
 	private List<Contact> mContacts;
@@ -293,5 +296,23 @@ public class MainApplication extends Application {
 	 */
 	public CalendarUtils getCalendarUtils() {
 		return mCalendarUtils;
+	}
+	
+	/**
+	 * Check for pro version.
+	 * 
+	 * @return True if pro version exist.
+	 */
+	public boolean isProPresent() {
+		PackageManager pm = getPackageManager();
+		boolean success = false;
+		try {
+			success = (PackageManager.SIGNATURE_MATCH == pm.checkSignatures(
+					this.getPackageName(), "ro.ciubex.brgenpro"));
+			Log.d(TAG, "isProPresent: " + success);
+		} catch (Exception e) {
+			Log.e(TAG, "isProPresent: " + e.getMessage(), e);
+		}
+		return success;
 	}
 }

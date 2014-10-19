@@ -99,13 +99,17 @@ public class AboutFragment extends BaseFragment {
 		});
 
 		Button bDonate = (Button) mFragmentView.findViewById(R.id.donate);
-		bDonate.setOnClickListener(new View.OnClickListener() {
+		if (mApplication.isProPresent()) {
+			bDonate.setVisibility(View.GONE);
+		} else {
+			bDonate.setOnClickListener(new View.OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-				onClickDonate();
-			}
-		});
+				@Override
+				public void onClick(View v) {
+					onClickDonate();
+				}
+			});
+		}
 	}
 
 	/**

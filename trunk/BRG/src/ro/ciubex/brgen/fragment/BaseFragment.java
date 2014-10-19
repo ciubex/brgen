@@ -108,17 +108,78 @@ public abstract class BaseFragment extends Fragment {
 	 */
 	public void showMessageDialog(int titleStringId, String message,
 			final int messageId, final Object anObject) {
-		AlertDialog.Builder alertDialog = new AlertDialog.Builder(mActivity);
-		alertDialog.setIcon(android.R.drawable.ic_dialog_info);
-		alertDialog.setTitle(getString(titleStringId));
-		alertDialog.setMessage(message);
-		alertDialog.setPositiveButton(R.string.ok,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						onMessageOk(messageId, anObject);
-					}
-				});
-		AlertDialog alert = alertDialog.create();
-		alert.show();
+		new AlertDialog.Builder(mActivity)
+				.setIcon(android.R.drawable.ic_dialog_info)
+				.setTitle(getString(titleStringId))
+				.setMessage(message)
+				.setPositiveButton(R.string.ok,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								onMessageOk(messageId, anObject);
+							}
+						}).show();
+	}
+
+	/**
+	 * This method should be used to show a confirmation dialog message to the
+	 * user.
+	 * 
+	 * @param titleStringId
+	 *            The resource string id used for the confirmation dialog title.
+	 * @param message
+	 *            The message used for the confirmation dialog text.
+	 * @param confirmationId
+	 *            The ID of the message to be identified on the caller activity.
+	 * @param anObject
+	 *            The object used by the caller activity.
+	 */
+	public void showConfirmationDialog(int titleStringId, String message,
+			final int confirmationId, final Object anObject) {
+		new AlertDialog.Builder(mActivity)
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setTitle(titleStringId)
+				.setMessage(message)
+				.setPositiveButton(R.string.yes,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								onConfirmationOk(confirmationId, anObject);
+							}
+
+						})
+				.setNegativeButton(R.string.no,
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								onConfirmationNo(confirmationId, anObject);
+							}
+						}).show();
+	}
+
+	/**
+	 * Method invoked when the used click on the OK confirmation dialog message.
+	 * 
+	 * @param confirmationId
+	 *            The ID of the message to be identified on the caller activity.
+	 * @param anObject
+	 *            The object used by the caller activity.
+	 */
+	protected void onConfirmationOk(int confirmationId, Object anObject) {
+
+	}
+
+	/**
+	 * Method invoked when the used click on the NO confirmation dialog message.
+	 * 
+	 * @param confirmationId
+	 *            The ID of the message to be identified on the caller activity.
+	 * @param anObject
+	 *            The object used by the caller activity.
+	 */
+	protected void onConfirmationNo(int confirmationId, Object anObject) {
+
 	}
 }

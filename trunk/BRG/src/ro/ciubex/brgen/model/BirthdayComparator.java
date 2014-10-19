@@ -21,39 +21,19 @@ package ro.ciubex.brgen.model;
 import java.util.Comparator;
 
 /**
- * This comparator is used to sort the contacts on the list alphabetically.
+ * This comparator is used to sort the contacts on the list by birthday.
  * 
  * @author Claudiu Ciobotariu
  * 
  */
-public class ContactsComparator implements Comparator<Contact> {
+public class BirthdayComparator implements Comparator<Contact> {
 
 	@Override
 	public int compare(Contact o1, Contact o2) {
-		return ContactsComparator.nameCompare(o1, o2);
+		if (o1.getBirthday() == null || o2.getBirthday() == null) {
+			return ContactsComparator.nameCompare(o1, o2);
+		}
+		return 0;
 	}
 
-	public static int nameCompare(Contact o1, Contact o2) {
-		String s1 = o1.getContactName();
-		String s2 = o2.getContactName();
-		int n1 = s1 != null ? s1.length() : 0;
-		int n2 = s2 != null ? s2.length() : 0;
-		int min = Math.min(n1, n2);
-		for (int i = 0; i < min; i++) {
-			char c1 = s1.charAt(i);
-			char c2 = s2.charAt(i);
-			if (c1 != c2) {
-				c1 = Character.toUpperCase(c1);
-				c2 = Character.toUpperCase(c2);
-				if (c1 != c2) {
-					c1 = Character.toLowerCase(c1);
-					c2 = Character.toLowerCase(c2);
-					if (c1 != c2) {
-						return c1 - c2;
-					}
-				}
-			}
-		}
-		return n1 - n2;
-	}
 }

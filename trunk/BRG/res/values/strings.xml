@@ -9,6 +9,8 @@
     <string name="loading_wait">Loading&#8230;</string>
     <string name="loading_pictures">Loading pictures&#8230;</string>
     <string name="generate_reminders">Generate reminders&#8230;</string>
+    <string name="generate_reminders_title">Generate reminders</string>
+    <string name="generate_reminders_question">Do you want to generate reminders for selected contacts?</string>
     <string name="filter">Filter</string>
     <string name="filtering">Filtering&#8230;</string>
     <string name="select_all">Select all</string>
@@ -21,6 +23,7 @@
     <string name="no_birthdays">Your contacts do not contain birthdays</string>
     <string name="birthdays_loaded">Were loaded %d birthdays</string>
     <string name="no_calendar">No access to any calendar to generate reminders.</string>
+    <string name="no_calendar_access">No access to any calendar to get reminders.</string>
     <string name="select_a_calendar">Select a calendar from settings first!</string>
     <string name="reminder_deleted">Deleted one reminder.</string>
     <string name="reminders_deleted">Deleted %d reminders.</string>
@@ -40,13 +43,21 @@
     <string name="remove_contact_birthday_question">Do you want to remove birthday informations for the contact: %s?</string>
     <string name="contact_birthday_removed">Contact birthday removed successfully!</string>
     <string name="contact_birthday_not_removed">No birthday removed for contact: %s.</string>
+    <string name="sync_in_progress">Synchronize contacts with reminders&#8230;</string>
+    <string name="sync_confirmation_title">Synchronize contacts reminders</string>
+    <string name="sync_confirmation_question">Do you want to synchronize contacts with existing reminders?\nNote, the existing reminders are recognized by the reminder title format.</string>
+    <string name="sync_no">No contact has reminders!</string>
+    <string name="sync_one">One contact has a reminder.</string>
+    <string name="sync_more">%d contacts has reminders.</string>
     <string name="age">Age: %d</string>
 
     <!-- Content Description -->
     <string name="desc_list_item_icon">Item Icon</string>
 
     <!-- Menu -->
+    <string name="action_back">Back</string>
     <string name="action_generate">Generate reminders</string>
+    <string name="action_sync">Synchronize reminders</string>
     <string name="action_reload">Reload</string>
     <string name="action_settings">Settings</string>
     <string name="action_exit">Exit</string>
@@ -72,6 +83,37 @@
         <item>@drawable/contacts</item>
         <item>@drawable/settings</item>
         <item>@drawable/about</item>
+    </array>
+
+    <!-- Alphabetically Sections -->
+    <array name="sections_alphabetically">
+        <item>-</item>
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+        <item>D</item>
+        <item>E</item>
+        <item>F</item>
+        <item>G</item>
+        <item>H</item>
+        <item>I</item>
+        <item>J</item>
+        <item>K</item>
+        <item>L</item>
+        <item>M</item>
+        <item>N</item>
+        <item>O</item>
+        <item>P</item>
+        <item>Q</item>
+        <item>R</item>
+        <item>S</item>
+        <item>T</item>
+        <item>U</item>
+        <item>V</item>
+        <item>W</item>
+        <item>X</item>
+        <item>Y</item>
+        <item>Z</item>
     </array>
 
     <!-- Settings -->
@@ -221,7 +263,7 @@ Thank you for using this application!<br/>]]>
     <!-- Donation -->
     <string name="donate">Donate</string>
     <string name="donate_title">Donation confirmation</string>
-    <string name="donate_message">If you appreciate this application, please do a donation!\nPressing YES button, you will be sent using your default browser to a PayPal donnation page.\nThank you for using this application!</string>
-    <string name="donate_url"><Data><![CDATA[https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=claudiu_ciobotariu%40yahoo%2ecom&lc=RO&item_name=Ciubex&item_number=BRG%20Donation&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted]]></Data></string>
+    <string name="donate_message">If you appreciate this application, please do a donation buying Birthday Reminder Gen. PRO!\nPressing YES button, you will be sent to Birthday Reminder Gen. PRO from Google Play Store.\nThank you for using this application!</string>
+    <string name="donate_url"><Data><![CDATA[https://play.google.com/store/apps/details?id=ro.ciubex.brgenpro]]></Data></string>
 
 </resources>
