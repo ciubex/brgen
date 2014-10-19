@@ -29,7 +29,6 @@ import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.OperationApplicationException;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
@@ -71,8 +70,7 @@ public class BirthdayRemoveAsyncTask extends AsyncTask<Void, Void, Boolean> {
 		boolean result = removeBirthdayEvent(mContentResolver);
 		if (result) {
 			if (mContact.haveEvent() || mContact.haveReminder()) {
-				removeEventsReminders(mContentResolver,
-						mCalendarUtils.getCalendarUriBase());
+				removeEventsReminders();
 				removeFromContactEvents();
 			}
 		}
@@ -126,27 +124,16 @@ public class BirthdayRemoveAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
 	/**
 	 * Remove the contact calendar event and reminder.
-	 * 
-	 * @param cr
-	 *            The application ContentResolver
-	 * @param calendarUriBase
-	 *            The calendar URI base path.
 	 */
-	private void removeEventsReminders(ContentResolver cr,
-			String calendarUriBase) {
-		if (calendarUriBase != null) {
-			Uri uriEvents = Uri.parse(calendarUriBase + "/events");
-			Uri uriReminders = Uri.parse(calendarUriBase + "/reminders");
-			if (mContact.haveEvent()) {
-				mCalendarUtils.deleteEntry(uriEvents, mContact.getEventId());
-				mContact.setEventId(-1);
-			}
-			if (mContact.haveReminder()) {
-				mCalendarUtils.deleteEntry(uriReminders,
-						mContact.getReminderId());
-				mContact.setReminderId(-1);
-			}
+	private void removeEventsReminders() {
+		if (mContact.haveEvent()) {
+			mCalendarUtils.removeEvent(mContact.getEventId());
+			mContact.setEventId(-1);
 			mContact.setChecked(false);
+		}
+		if (mContact.haveReminder()) {
+			mCalendarUtils.removeReminder(mContact.getReminderId());
+			mContact.setReminderId(-1);
 		}
 	}
 

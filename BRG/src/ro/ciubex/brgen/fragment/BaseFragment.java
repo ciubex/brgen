@@ -95,21 +95,62 @@ public abstract class BaseFragment extends Fragment {
 	}
 
 	/**
+	 * Show to the user an error dialog message.
+	 * 
+	 * @param titleStringId
+	 *            The resource string id used for the dialog title.
+	 * @param messageId
+	 *            The resource string id used for the dialog text.
+	 */
+	protected void showMessageError(int titleStringId, int messageId) {
+		showMessageDialog(titleStringId, getString(messageId),
+				android.R.drawable.ic_dialog_alert, 0, null);
+	}
+
+	/**
+	 * Show to the user an error dialog message.
+	 * 
+	 * @param titleStringId
+	 *            The resource string id used for the dialog title.
+	 * @param message
+	 *            The message from dialog text.
+	 */
+	protected void showMessageError(int titleStringId, String message) {
+		showMessageDialog(titleStringId, message,
+				android.R.drawable.ic_dialog_alert, 0, null);
+	}
+
+	/**
+	 * Show to the user an information dialog message.
+	 * 
+	 * @param titleStringId
+	 *            The resource string id used for the dialog title.
+	 * @param message
+	 *            The message from dialog text.
+	 */
+	protected void showMessageInfo(int titleStringId, String message) {
+		showMessageDialog(titleStringId, message,
+				android.R.drawable.ic_dialog_info, 0, null);
+	}
+
+	/**
 	 * This method should be used to show a dialog message to the user.
 	 * 
 	 * @param titleStringId
-	 *            The resource string id used for the confirmation dialog title.
+	 *            The resource string id used for the dialog title.
 	 * @param message
-	 *            The message used for the confirmation dialog text.
+	 *            The message used for the dialog text.
+	 * @param iconId
+	 *            The dialog icon ID.
 	 * @param messageId
 	 *            The ID of the message to be identified on the caller activity.
 	 * @param anObject
 	 *            The object used by the caller activity.
 	 */
-	public void showMessageDialog(int titleStringId, String message,
-			final int messageId, final Object anObject) {
+	private void showMessageDialog(int titleStringId, String message,
+			int iconId, final int messageId, final Object anObject) {
 		new AlertDialog.Builder(mActivity)
-				.setIcon(android.R.drawable.ic_dialog_info)
+				.setIcon(iconId)
 				.setTitle(getString(titleStringId))
 				.setMessage(message)
 				.setPositiveButton(R.string.ok,

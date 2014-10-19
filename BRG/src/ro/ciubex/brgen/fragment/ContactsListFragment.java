@@ -269,8 +269,7 @@ public class ContactsListFragment extends BaseFragment implements
 			mApplication.showMessageInfo(mActivity, result.resultMessage);
 			new BirthdaysLoaderAsyncTask(mApplication, mAdapter).execute();
 		} else {
-			showMessageDialog(R.string.information, result.resultMessage, 0,
-					null);
+			showMessageError(R.string.error_occurred, result.resultMessage);
 		}
 	}
 
@@ -319,6 +318,9 @@ public class ContactsListFragment extends BaseFragment implements
 						case 3:
 							regenerateReminder(contactPosition);
 							break;
+						case 4:
+							removeReminder(contactPosition);
+							break;
 						}
 					}
 				});
@@ -349,10 +351,16 @@ public class ContactsListFragment extends BaseFragment implements
 		Contact contact = mAdapter.getItem(contactPosition);
 		if (contact != null) {
 			if (contact.haveBirthday()) {
-				showRemoveContactBirthdayConfirmation(contact);
+				showConfirmationDialog(R.string.remove_contact_birthday_title,
+						mApplication.getString(
+								R.string.remove_contact_birthday_question,
+								contact.getContactName()),
+						CONFIRMATION_REMOVE_BIRTHDAY, contact);
 			} else {
-				mApplication.showMessageError(mActivity,
-						R.string.no_birthday_for, contact.getContactName());
+				showMessageError(
+						R.string.attention,
+						getString(R.string.no_birthday_for,
+								contact.getContactName()));
 			}
 		}
 	}
@@ -384,12 +392,39 @@ public class ContactsListFragment extends BaseFragment implements
 		Contact contact = mAdapter.getItem(contactPosition);
 		if (contact != null) {
 			if (contact.haveBirthday()) {
-				contact.setChecked(true);
-				new GenerateRemindersAsyncTask(this, mApplication, contact)
-						.execute();
+				if (mApplication.getApplicationPreferences()
+						.haveCalendarSelected()) {
+					contact.setChecked(true);
+					new GenerateRemindersAsyncTask(this, mApplication,
+							mAdapter, contact).execute();
+				} else {
+					showMessageError(R.string.attention,
+							R.string.select_a_calendar);
+				}
 			} else {
-				mApplication.showMessageError(mActivity,
-						R.string.no_birthday_for, contact.getContactName());
+				showMessageError(
+						R.string.attention,
+						getString(R.string.no_birthday_for,
+								contact.getContactName()));
+			}
+		}
+	}
+
+	/**
+	 * Method used to remove generated reminder for the selected contact.
+	 * 
+	 * @param contactPosition
+	 *            Position of selected contact.
+	 */
+	private void removeReminder(int contactPosition) {
+		Contact contact = mAdapter.getItem(contactPosition);
+		if (contact != null) {
+			if (mApplication.getApplicationPreferences().haveCalendarSelected()) {
+				contact.setChecked(false);
+				new GenerateRemindersAsyncTask(this, mApplication, mAdapter,
+						contact).execute();
+			} else {
+				showMessageError(R.string.attention, R.string.select_a_calendar);
 			}
 		}
 	}
@@ -414,7 +449,7 @@ public class ContactsListFragment extends BaseFragment implements
 		if (Constants.OK == result.resultId) {
 			mApplication.showMessageInfo(mActivity, result.resultMessage);
 		} else {
-			mApplication.showMessageError(mActivity, result.resultMessage);
+			showMessageError(R.string.attention, result.resultMessage);
 		}
 	}
 
@@ -428,21 +463,6 @@ public class ContactsListFragment extends BaseFragment implements
 		if (requestCode == REQUEST_CODE_CONTACT_EDITOR) {
 			loadContactListView();
 		}
-	}
-
-	/**
-	 * Show a confirmation dialog of removing birthday information from selected
-	 * contact
-	 * 
-	 * @param contact
-	 *            Selected contact
-	 */
-	private void showRemoveContactBirthdayConfirmation(final Contact contact) {
-		showConfirmationDialog(R.string.remove_contact_birthday_title,
-				mApplication.getString(
-						R.string.remove_contact_birthday_question,
-						contact.getContactName()),
-				CONFIRMATION_REMOVE_BIRTHDAY, contact);
 	}
 
 	/**
@@ -460,7 +480,7 @@ public class ContactsListFragment extends BaseFragment implements
 			doRemoveContactBirthday((Contact) anObject);
 			break;
 		case CONFIRMATION_GEN_REMINDERS:
-			new GenerateRemindersAsyncTask(this, mApplication,
+			new GenerateRemindersAsyncTask(this, mApplication, mAdapter,
 					mApplication.getContactsAsArray()).execute();
 			break;
 		case CONFIRMATION_SYNC_REMINDERS:
@@ -488,9 +508,9 @@ public class ContactsListFragment extends BaseFragment implements
 		if (result) {
 			mAdapter.notifyDataSetChanged();
 		} else {
-			showMessageDialog(R.string.error_occurred, mApplication.getString(
+			showMessageError(R.string.error_occurred, mApplication.getString(
 					R.string.contact_birthday_not_removed,
-					contact.getContactName()), 0, null);
+					contact.getContactName()));
 		}
 	}
 
@@ -504,8 +524,7 @@ public class ContactsListFragment extends BaseFragment implements
 							.getString(R.string.generate_reminders_question),
 					CONFIRMATION_GEN_REMINDERS, null);
 		} else {
-			mApplication
-					.showMessageError(mActivity, R.string.select_a_calendar);
+			showMessageError(R.string.attention, R.string.select_a_calendar);
 		}
 	}
 
@@ -514,12 +533,15 @@ public class ContactsListFragment extends BaseFragment implements
 	 */
 	public void syncReminders() {
 		if (mApplication.getContacts().isEmpty()) {
-			mApplication.showMessageError(mActivity, R.string.no_contacts);
-		} else {
+			showMessageError(R.string.attention, R.string.no_contacts);
+		} else if (mApplication.getApplicationPreferences()
+				.haveCalendarSelected()) {
 			showConfirmationDialog(
 					R.string.sync_confirmation_title,
 					mApplication.getString(R.string.sync_confirmation_question),
 					CONFIRMATION_SYNC_REMINDERS, null);
+		} else {
+			showMessageError(R.string.attention, R.string.select_a_calendar);
 		}
 	}
 

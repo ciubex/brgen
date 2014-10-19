@@ -219,51 +219,7 @@ public class MainApplication extends Application {
 			Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 		}
 	}
-
-	/**
-	 * Method used to show the errors.
-	 * 
-	 * @param context
-	 *            The context where should be displayed the error message.
-	 * @param resourceMessageId
-	 *            The string resource id.
-	 */
-	public void showMessageError(Context context, int resourceMessageId) {
-		String message = getString(resourceMessageId);
-		showMessageError(context, message);
-	}
-
-	/**
-	 * Method used to show error formated messages.
-	 * 
-	 * @param context
-	 *            The context where should be displayed the error message.
-	 * @param resourceMessageId
-	 *            The string resource id.
-	 * @param formatArgs
-	 *            The arguments used on formated message.
-	 */
-	public void showMessageError(Context context, int resourceMessageId,
-			Object... formatArgs) {
-		String message = getString(resourceMessageId, formatArgs);
-		showMessageError(context, message);
-	}
-
-	/**
-	 * This method is used to show on front of a context a toast message
-	 * containing applications errors.
-	 * 
-	 * @param context
-	 *            The context where should be showed the message.
-	 * @param message
-	 *            The error message used to be displayed on the information box.
-	 */
-	public void showMessageError(Context context, String message) {
-		if (message != null && message.length() > 0) {
-			Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-		}
-	}
-
+	
 	/**
 	 * Method used to obtain the age based on a birthday calendar.
 	 * 

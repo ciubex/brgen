@@ -336,7 +336,7 @@ public class SettingsFragment extends PreferenceFragment implements
 				// restartPreferencesActivity();
 			}
 		} else {
-			mApplication.showMessageError(mActivity, result.resultMessage);
+			showMessageError(R.string.attention, result.resultMessage);
 		}
 	}
 
@@ -378,5 +378,27 @@ public class SettingsFragment extends PreferenceFragment implements
 				R.xml.settings_preferences, true);
 
 		// restartPreferencesActivity();
+	}
+
+	/**
+	 * Show to the user an error dialog message.
+	 * 
+	 * @param titleStringId
+	 *            The resource string id used for the dialog title.
+	 * @param message
+	 *            The message from dialog text.
+	 */
+	protected void showMessageError(int titleStringId, String message) {
+		new AlertDialog.Builder(mActivity)
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setTitle(getString(titleStringId))
+				.setMessage(message)
+				.setPositiveButton(R.string.ok,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// ignored
+							}
+						}).show();
 	}
 }

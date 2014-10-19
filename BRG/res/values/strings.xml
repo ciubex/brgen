@@ -36,6 +36,7 @@
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="attention">Attention:</string>
     <string name="information">Information:</string>
     <string name="error_occurred">An error occurred:</string>
     <string name="no_birthday_for">The contact: %s don\'t have birthday informations!</string>
@@ -46,9 +47,9 @@
     <string name="sync_in_progress">Synchronize contacts with reminders&#8230;</string>
     <string name="sync_confirmation_title">Synchronize contacts reminders</string>
     <string name="sync_confirmation_question">Do you want to synchronize contacts with existing reminders?\nNote, the existing reminders are recognized by the reminder title format.</string>
-    <string name="sync_no">No contact has reminders!</string>
-    <string name="sync_one">One contact has a reminder.</string>
-    <string name="sync_more">%d contacts has reminders.</string>
+    <string name="sync_no">No contact have reminders!</string>
+    <string name="sync_one">One contact have a reminder.</string>
+    <string name="sync_more">%d contacts have reminders.</string>
     <string name="age">Age: %d</string>
 
     <!-- Content Description -->
@@ -68,6 +69,7 @@
         <item>Remove Birthday</item>
         <item>Contact</item>
         <item>(Re)Generate reminder</item>
+        <item>Remove reminder</item>
     </string-array>
 
     <!-- Slide Menu Items -->
