@@ -21,8 +21,10 @@ package ro.ciubex.brgen.fragment;
 import java.util.Calendar;
 
 import ro.ciubex.brgen.MainApplication;
+import ro.ciubex.brgen.R;
 import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.tasks.BirthdaySaveAsyncTask;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
@@ -39,6 +41,7 @@ public class DatePickerDialogFragment extends DialogFragment implements
 		OnDateSetListener, BirthdaySaveAsyncTask.Responder {
 
 	private MainApplication mApplication;
+	private Activity mActivity;
 	private Contact mContact;
 	private BaseAdapter mAdapter;
 	private Calendar mOldBirthday;
@@ -72,6 +75,14 @@ public class DatePickerDialogFragment extends DialogFragment implements
 		this.mAdapter = adapter;
 	}
 
+	/**
+	 * @param activity
+	 *            the mActivity to set
+	 */
+	public void setActivity(Activity activity) {
+		this.mActivity = activity;
+	}
+
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		Calendar cal = mContact.getBirthday();
@@ -87,7 +98,8 @@ public class DatePickerDialogFragment extends DialogFragment implements
 	public void onDateSet(DatePicker view, int year, int monthOfYear,
 			int dayOfMonth) {
 		mOldBirthday = mContact.getBirthday();
-		Calendar newCalendar = Calendar.getInstance(mApplication.getDefaultLocale());
+		Calendar newCalendar = Calendar.getInstance(mApplication
+				.getDefaultLocale());
 		newCalendar.set(Calendar.YEAR, year);
 		newCalendar.set(Calendar.MONTH, monthOfYear);
 		newCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -101,6 +113,10 @@ public class DatePickerDialogFragment extends DialogFragment implements
 			mAdapter.notifyDataSetChanged();
 		} else {
 			mContact.setBirthday(mOldBirthday);
+		}
+		if (mActivity != null) {
+			mApplication.showMessageInfo(mActivity,
+					result ? R.string.birthday_updated : R.string.no_changes);
 		}
 	}
 

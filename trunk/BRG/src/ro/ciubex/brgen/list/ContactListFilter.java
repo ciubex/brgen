@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import ro.ciubex.brgen.adapter.ContactListAdapter;
+import ro.ciubex.brgen.adapter.ContactBaseAdapter;
 import ro.ciubex.brgen.model.Contact;
 import android.widget.Filter;
 
@@ -35,10 +35,10 @@ import android.widget.Filter;
  */
 public class ContactListFilter extends Filter {
 
-	private ContactListAdapter adapter;
+	private ContactBaseAdapter adapter;
 	private Locale locale;
 
-	public ContactListFilter(ContactListAdapter adapter, Locale locale) {
+	public ContactListFilter(ContactBaseAdapter adapter, Locale locale) {
 		this.adapter = adapter;
 		this.locale = locale;
 	}

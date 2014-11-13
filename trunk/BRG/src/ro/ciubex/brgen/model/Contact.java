@@ -30,86 +30,100 @@ import android.graphics.Bitmap;
  * 
  */
 public class Contact implements Comparable<Contact> {
-	private long id;
-	private long eventId;
-	private long reminderId;
-	private boolean checked;
-	private String contactName;
-	private Calendar birthday;
-	private boolean loadedBirthday;
-	private Bitmap picture;
-	private boolean pictureLoaded;
-	private boolean pictureLoading;
+	private long mId;
+	private long mEventId;
+	private long mReminderId;
+	private boolean mChecked;
+	private String mContactName;
+	private Calendar mBirthday;
+	private boolean mLoadedBirthday;
+	private Bitmap mThumbnail;
+	private boolean mPictureLoaded;
+	private boolean mPictureLoading;
+	private String[] mPhoneNumbers;
 
 	public Contact() {
-		eventId = -1;
-		reminderId = -1;
+		mEventId = -1;
+		mReminderId = -1;
 	}
 
 	public long getId() {
-		return id;
+		return mId;
 	}
 
 	public void setId(long id) {
-		this.id = id;
+		this.mId = id;
 	}
 
 	public long getEventId() {
-		return eventId;
+		return mEventId;
 	}
 
 	public boolean haveEvent() {
-		return eventId > -1;
+		return mEventId > -1;
 	}
 
 	public void setEventId(long eventId) {
-		this.eventId = eventId;
+		this.mEventId = eventId;
 	}
 
 	public long getReminderId() {
-		return reminderId;
+		return mReminderId;
 	}
 
 	public boolean haveReminder() {
-		return reminderId > -1;
+		return mReminderId > -1;
 	}
 
 	public void setReminderId(long reminderId) {
-		this.reminderId = reminderId;
+		this.mReminderId = reminderId;
 	}
 
 	public boolean isChecked() {
-		return checked;
+		return mChecked;
 	}
 
 	public void setChecked(boolean checked) {
-		this.checked = checked;
+		this.mChecked = checked;
 	}
 
 	public String getContactName() {
-		return contactName;
+		return mContactName;
 	}
 
 	public void setContactName(String contactName) {
-		this.contactName = contactName;
+		this.mContactName = contactName;
 	}
 
 	public Calendar getBirthday() {
-		return birthday;
+		return mBirthday;
 	}
 
 	public void setBirthday(Calendar birthday) {
-		this.birthday = birthday;
+		this.mBirthday = birthday;
+	}
+
+	public String[] getPhoneNumbers() {
+		return mPhoneNumbers;
+	}
+
+	public void setPhoneNumbers(String[] phoneNumbers) {
+		mPhoneNumbers = phoneNumbers;
+	}
+
+	public boolean havePhoneNumbers() {
+		return mPhoneNumbers != null && mPhoneNumbers.length > 0;
 	}
 
 	@Override
 	public int compareTo(Contact another) {
-		int n1 = contactName != null ? contactName.length() : 0;
-		int n2 = another.contactName != null ? another.contactName.length() : 0;
+		int n1 = mContactName != null ? mContactName.length() : 0;
+		int n2 = another.mContactName != null ? another.mContactName.length()
+				: 0;
 		int min = Math.min(n1, n2);
 		for (int i = 0; i < min; i++) {
-			char c1 = contactName.charAt(i);
-			char c2 = another.contactName.charAt(i);
+			char c1 = mContactName.charAt(i);
+			char c2 = another.mContactName.charAt(i);
 			if (c1 != c2) {
 				c1 = Character.toUpperCase(c1);
 				c2 = Character.toUpperCase(c2);
@@ -126,63 +140,62 @@ public class Contact implements Comparable<Contact> {
 	}
 
 	public boolean haveBirthday() {
-		return birthday != null;
+		return mBirthday != null;
 	}
 
 	public boolean isLoadedBirthday() {
-		return loadedBirthday;
+		return mLoadedBirthday;
 	}
 
 	public void setLoadedBirthday(boolean loadedBirthday) {
-		this.loadedBirthday = loadedBirthday;
-	}
-
-	/**
-	 * @return the picture
-	 */
-	public Bitmap getPicture() {
-		return picture;
-	}
-
-	/**
-	 * @param picture
-	 *            the picture to set
-	 */
-	public void setPicture(Bitmap picture) {
-		this.picture = picture;
+		this.mLoadedBirthday = loadedBirthday;
 	}
 
 	public boolean havePicture() {
-		return (picture != null) ? (picture.getWidth() > 0 && picture
-				.getHeight() > 0) : false;
+		return (mThumbnail != null) && mThumbnail.getByteCount() > 0;
+	}
+
+	/**
+	 * @return the thumbnail
+	 */
+	public Bitmap getThumbnail() {
+		return mThumbnail;
+	}
+
+	/**
+	 * @param thumbnail
+	 *            the thumbnail to set
+	 */
+	public void setThumbnail(Bitmap thumbnail) {
+		this.mThumbnail = thumbnail;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("ContactModel [");
-		builder.append(contactName);
+		builder.append(mContactName);
 		builder.append(", ");
-		builder.append(id);
+		builder.append(mId);
 		builder.append(", ");
-		builder.append(birthday);
+		builder.append(mBirthday);
 		builder.append("]");
 		return builder.toString();
 	}
 
 	public boolean isPictureLoaded() {
-		return pictureLoaded;
+		return mPictureLoaded;
 	}
 
 	public void setPictureLoaded(boolean flag) {
-		this.pictureLoaded = flag;
+		this.mPictureLoaded = flag;
 	}
 
 	/**
 	 * @return the pictureLoading
 	 */
 	public boolean isPictureLoading() {
-		return pictureLoading;
+		return mPictureLoading;
 	}
 
 	/**
@@ -190,6 +203,17 @@ public class Contact implements Comparable<Contact> {
 	 *            the pictureLoading to set
 	 */
 	public void setPictureLoading(boolean pictureLoading) {
-		this.pictureLoading = pictureLoading;
+		this.mPictureLoading = pictureLoading;
+	}
+
+	public void toggleChecked() {
+		mChecked = !mChecked;
+	}
+	
+	public boolean isModified() {
+		if (!mChecked) {
+			return haveReminder();
+		}
+		return !haveReminder();
 	}
 }

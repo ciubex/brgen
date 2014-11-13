@@ -23,6 +23,7 @@ import java.util.List;
 
 import ro.ciubex.brgen.adapter.SlideMenuListAdapter;
 import ro.ciubex.brgen.fragment.AboutFragment;
+import ro.ciubex.brgen.fragment.BaseFragment;
 import ro.ciubex.brgen.fragment.ContactsListFragment;
 import ro.ciubex.brgen.fragment.LicenseFragment;
 import ro.ciubex.brgen.fragment.SettingsFragment;
@@ -148,7 +149,7 @@ public class MainActivity extends Activity {
 		if (savedInstanceState == null) {
 			mFragmentIdCurrent = FRG_CNT_LIST;
 			// on first time display view for first nav item
-			displayView(mFragmentIdCurrent);
+			displayView(mFragmentIdCurrent, -1);
 		}
 	}
 
@@ -172,7 +173,7 @@ public class MainActivity extends Activity {
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
 			// display view for selected nav drawer item
-			displayView(position);
+			displayView(position, -1);
 		}
 	}
 
@@ -206,8 +207,8 @@ public class MainActivity extends Activity {
 		}
 		// Handle action bar actions click
 		switch (item.getItemId()) {
-		case R.id.action_generate:
-			((ContactsListFragment) mFragments[FRG_CNT_LIST]).saveReminders();
+		case R.id.action_update_reminders:
+			((ContactsListFragment) mFragments[FRG_CNT_LIST]).updateAllReminders();
 			return true;
 		case R.id.action_sync:
 			((ContactsListFragment) mFragments[FRG_CNT_LIST]).syncReminders();
@@ -217,10 +218,10 @@ public class MainActivity extends Activity {
 					.reloadContactList();
 			return true;
 		case R.id.action_settings:
-			displayView(FRG_SETTINGS);
+			displayView(FRG_SETTINGS, -1);
 			return true;
 		case R.id.action_back:
-			displayView(FRG_CNT_LIST);
+			displayView(FRG_CNT_LIST, -1);
 			return true;
 		case R.id.action_exit:
 			doExit();
@@ -249,7 +250,7 @@ public class MainActivity extends Activity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.findItem(R.id.action_settings).setVisible(
 				mFragmentIdCurrent == FRG_CNT_LIST);
-		menu.findItem(R.id.action_generate).setVisible(
+		menu.findItem(R.id.action_update_reminders).setVisible(
 				mFragmentIdCurrent == FRG_CNT_LIST);
 		menu.findItem(R.id.action_sync).setVisible(
 				mFragmentIdCurrent == FRG_CNT_LIST);
@@ -263,7 +264,7 @@ public class MainActivity extends Activity {
 	/**
 	 * Displaying fragment view for selected nav drawer list item
 	 * */
-	public void displayView(int position) {
+	public void displayView(int position, int contentId) {
 		// update the main content by replacing fragments
 		Fragment fragment = null;
 		if (position > -1 && position < mFragments.length) {
@@ -275,6 +276,10 @@ public class MainActivity extends Activity {
 		}
 
 		if (fragment != null) {
+			if (fragment instanceof BaseFragment
+					&& contentId > BaseFragment.NO_CONTENT_ID) {
+				((BaseFragment) fragment).setContentId(contentId);
+			}
 			FragmentManager fragmentManager = getFragmentManager();
 			fragmentManager.beginTransaction()
 					.replace(R.id.frame_container, fragment).commit();
@@ -335,11 +340,11 @@ public class MainActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		if (mFragmentIdCurrent == FRG_LICENSE) {
-			displayView(FRG_ABOUT);
+			displayView(FRG_ABOUT, -1);
 		} else if (mFragmentIdCurrent == FRG_CNT_LIST) {
 			super.onBackPressed();
 		} else {
-			displayView(FRG_CNT_LIST);
+			displayView(FRG_CNT_LIST, -1);
 		}
 	}
 }

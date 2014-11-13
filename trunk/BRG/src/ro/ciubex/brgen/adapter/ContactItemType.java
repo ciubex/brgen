@@ -24,6 +24,7 @@ package ro.ciubex.brgen.adapter;
  * @author Claudiu Ciobotariu
  * 
  */
-public enum ContactItemType {
-	ITEM, SEPARATOR, UNUSED
+public interface ContactItemType {
+	public static final int SEPARATOR = 0;
+	public static final int ITEM = 1;
 }

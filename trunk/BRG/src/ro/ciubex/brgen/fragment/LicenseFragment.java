@@ -24,6 +24,7 @@ import java.io.InputStream;
 import ro.ciubex.brgen.MainActivity;
 import ro.ciubex.brgen.R;
 import android.content.res.AssetManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -35,6 +36,9 @@ import android.widget.TextView;
  * 
  */
 public class LicenseFragment extends BaseFragment {
+	public static final int LICENCE = 0;
+	public static final int LICENCE_2_0 = 1;
+	private final static String TAG = LicenseFragment.class.getName();
 	private TextView licenseTxt;
 	private Button okButton;
 
@@ -65,14 +69,26 @@ public class LicenseFragment extends BaseFragment {
 		});
 
 		licenseTxt = (TextView) mFragmentView.findViewById(R.id.licenseTxt);
-		licenseTxt.setText(getStreamText("LICENSE.TXT"));
 	}
 
 	/**
 	 * Invoked when is pressed the OK button.
 	 */
 	private void onClickOk() {
-		mActivity.displayView(MainActivity.FRG_ABOUT);
+		mActivity.displayView(MainActivity.FRG_ABOUT, -1);
+	}
+
+	/* (non-Javadoc)
+	 * @see android.app.Fragment#onResume()
+	 */
+	@Override
+	public void onResume() {
+		String fileName = "LICENSE.TXT";
+		if (mContentId == LICENCE_2_0) {
+			fileName = "LICENSE-2.0.TXT";
+		}
+		licenseTxt.setText(getStreamText(fileName));
+		super.onResume();
 	}
 
 	/**
@@ -101,7 +117,7 @@ public class LicenseFragment extends BaseFragment {
 				try {
 					in.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					Log.e(TAG, e.getMessage(), e);
 				}
 			}
 		}

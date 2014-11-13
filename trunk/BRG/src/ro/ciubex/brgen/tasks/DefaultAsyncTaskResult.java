@@ -28,5 +28,6 @@ package ro.ciubex.brgen.tasks;
 public class DefaultAsyncTaskResult {
 	public int taskId;
 	public int resultId;
+	public Object object;
 	public String resultMessage;
 }

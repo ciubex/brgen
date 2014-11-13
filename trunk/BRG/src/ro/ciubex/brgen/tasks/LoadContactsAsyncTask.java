@@ -27,11 +27,13 @@ import ro.ciubex.brgen.model.Constants;
 import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.model.ContactEvent;
 import ro.ciubex.brgen.model.ContactsComparator;
+import ro.ciubex.brgen.util.Utilities;
 import android.app.Application;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 /**
  * This is an AsyncTask used to load all contacts from the phone.
@@ -41,6 +43,8 @@ import android.provider.ContactsContract;
  */
 public class LoadContactsAsyncTask extends
 		AsyncTask<Void, Void, DefaultAsyncTaskResult> {
+	private final static String TAG = LoadContactsAsyncTask.class.getName();
+
 	/**
 	 * Responder used on loading process.
 	 */
@@ -115,7 +119,7 @@ public class LoadContactsAsyncTask extends
 
 			String[] selectionArgs = null;
 
-			String sortOrder = null;// ContactsContract.Contacts.DISPLAY_NAME;
+			String sortOrder = null;
 
 			cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, columns,
 					where, selectionArgs, sortOrder);
@@ -146,13 +150,11 @@ public class LoadContactsAsyncTask extends
 			}
 			result.resultMessage = resultMessage;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.e(TAG, e.getMessage(), e);
 			result.resultId = Constants.ERROR;
 			result.resultMessage = e.getMessage();
 		} finally {
-			if (cursor != null && !cursor.isClosed()) {
-				cursor.close();
-			}
+			Utilities.closeCursor(cursor);
 		}
 		Collections.sort(mContacts, new ContactsComparator());
 	}
@@ -163,10 +165,11 @@ public class LoadContactsAsyncTask extends
 	private void getContactsEvents() {
 		if (mContacts.size() > 0) {
 			Application app = mResponder.getApplication();
-			List<ContactEvent> generated = ((MainApplication)app).getApplicationPreferences().getContactEvents();
+			List<ContactEvent> generated = ((MainApplication) app)
+					.getApplicationPreferences().getContactEvents();
 			if (generated.size() > 0) {
-				for(ContactEvent cem : generated) {
-					for(Contact contact : mContacts) {
+				for (ContactEvent cem : generated) {
+					for (Contact contact : mContacts) {
 						if (contact.getId() == cem.contactId) {
 							contact.setChecked(true);
 							contact.setEventId(cem.eventId);

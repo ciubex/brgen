@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/filter" />
-    
+
     <CheckedTextView
         android:id="@+id/check_box_all"
         android:layout_width="match_parent"
@@ -17,10 +17,11 @@
         android:checkMark="@drawable/custom_checkbox"
         android:gravity="center_vertical"
         android:orientation="vertical"
-        android:padding="2dip"
+        android:paddingLeft="4dip"
+        android:paddingRight="8dip"
         android:text="@string/select_all" />
 
-    <ro.ciubex.brgen.list.ContactListView
+    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/contacts_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

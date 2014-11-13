@@ -21,52 +21,46 @@ package ro.ciubex.brgen.adapter;
 import ro.ciubex.brgen.model.Contact;
 
 /**
- * @author Claudiu
+ * This is the contact list item class, used to prepare section label.
+ * 
+ * @author Claudiu Ciobotariu
  * 
  */
 public class ContactListItem {
-	private ContactItemType itemType;
-	private String sectionLabel = "";
-	private Contact contactModel;
-
-	public ContactListItem() {
-		itemType = ContactItemType.UNUSED;
-	}
+	private int mItemType;
+	private String mSectionLabel = "";
+	private Contact mContactModel;
 
 	public ContactListItem(String sectionLabel) {
-		this.sectionLabel = sectionLabel;
-		itemType = ContactItemType.SEPARATOR;
+		this.mSectionLabel = sectionLabel;
+		mItemType = ContactItemType.SEPARATOR;
 	}
-
+	
 	public ContactListItem(Contact contactModel) {
-		this.contactModel = contactModel;
-		itemType = ContactItemType.ITEM;
+		this.mContactModel = contactModel;
+		mItemType = ContactItemType.ITEM;
 		char ch = contactModel.getContactName().charAt(0);
-		sectionLabel = (Character.isDigit(ch) ? "-" : ""
+		mSectionLabel = (Character.isDigit(ch) ? "-" : ""
 				+ Character.toUpperCase(ch));
 	}
 
-	public ContactItemType getItemType() {
-		return itemType;
-	}
-
-	public void setItemType(ContactItemType itemType) {
-		this.itemType = itemType;
+	public int getItemType() {
+		return mItemType;
 	}
 
 	public String getSectionLabel() {
-		return sectionLabel;
+		return mSectionLabel;
 	}
 
 	public Contact getContactModel() {
-		return contactModel;
+		return mContactModel;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("ContactListItem [").append(sectionLabel).append(", ")
-				.append(contactModel).append("]");
+		builder.append("ContactListItem [").append(mSectionLabel).append(", ")
+				.append(mContactModel).append("]");
 		return builder.toString();
 	}
 
