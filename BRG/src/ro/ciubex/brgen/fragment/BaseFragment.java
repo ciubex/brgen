@@ -34,9 +34,11 @@ import android.view.ViewGroup;
  * 
  */
 public abstract class BaseFragment extends Fragment {
+	public static final int NO_CONTENT_ID = -1;
 	protected MainApplication mApplication;
 	protected MainActivity mActivity;
 	protected View mFragmentView;
+	protected int mContentId;
 
 	public BaseFragment() {
 	}
@@ -222,5 +224,12 @@ public abstract class BaseFragment extends Fragment {
 	 */
 	protected void onConfirmationNo(int confirmationId, Object anObject) {
 
+	}
+
+	/**
+	 * @param mContentId the mContentId to set
+	 */
+	public void setContentId(int contentId) {
+		this.mContentId = contentId;
 	}
 }

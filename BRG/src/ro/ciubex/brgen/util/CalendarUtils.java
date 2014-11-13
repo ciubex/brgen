@@ -307,7 +307,6 @@ public class CalendarUtils {
 			}
 		} catch (Exception e) {
 			Log.e(TAG, "Querying uri:" + uri.toString() + " for:" + eventId, e);
-			e.printStackTrace();
 		} finally {
 			if (cursor != null && !cursor.isClosed()) {
 				cursor.close();

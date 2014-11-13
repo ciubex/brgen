@@ -8,11 +8,11 @@
         android:title="">
         <menu>
             <item
-                android:id="@+id/action_generate"
+                android:id="@+id/action_update_reminders"
                 android:icon="@drawable/ic_menu_agenda"
                 android:orderInCategory="100"
                 android:showAsAction="never"
-                android:title="@string/action_generate"/>
+                android:title="@string/action_update_reminders"/>
             <item
                 android:id="@+id/action_sync"
                 android:icon="@drawable/ic_menu_sync"

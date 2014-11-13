@@ -19,15 +19,15 @@
 package ro.ciubex.brgen.tasks;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ro.ciubex.brgen.MainApplication;
 import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.model.ContactEvent;
-import ro.ciubex.brgen.util.ApplicationPreferences;
 import ro.ciubex.brgen.util.BirthdayDBUtils;
 import ro.ciubex.brgen.util.CalendarUtils;
-import ro.ciubex.brgen.util.Utilities;
 import ro.ciubex.brgen.util.CalendarUtils.SaveType;
+import ro.ciubex.brgen.util.Utilities;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
@@ -35,6 +35,7 @@ import android.content.OperationApplicationException;
 import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 /**
  * An AsyncTask used to save birthday informations for a contact.
@@ -43,6 +44,7 @@ import android.provider.ContactsContract;
  * 
  */
 public class BirthdaySaveAsyncTask extends AsyncTask<Void, Void, Boolean> {
+	private final static String TAG = BirthdaySaveAsyncTask.class.getName();
 	private MainApplication mApplication;
 	private CalendarUtils mCalendarUtils;
 	private Contact mContact;
@@ -143,9 +145,9 @@ public class BirthdaySaveAsyncTask extends AsyncTask<Void, Void, Boolean> {
 				result = true;
 			}
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			Log.e(TAG, e.getMessage(), e);
 		} catch (OperationApplicationException e) {
-			e.printStackTrace();
+			Log.e(TAG, e.getMessage(), e);
 		}
 		return result;
 	}
@@ -180,9 +182,9 @@ public class BirthdaySaveAsyncTask extends AsyncTask<Void, Void, Boolean> {
 				result = true;
 			}
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			Log.e(TAG, e.getMessage(), e);
 		} catch (OperationApplicationException e) {
-			e.printStackTrace();
+			Log.e(TAG, e.getMessage(), e);
 		}
 		return result;
 	}
@@ -198,18 +200,35 @@ public class BirthdaySaveAsyncTask extends AsyncTask<Void, Void, Boolean> {
 		contactEvent.contactId = mContact.getId();
 		contactEvent.eventId = mContact.getEventId();
 		contactEvent.reminderId = mContact.getReminderId();
-		ApplicationPreferences applicationPreferences = mApplication
-				.getApplicationPreferences();
 
 		SaveType saveType = SaveType.NOTHING;
 		if (mContact.haveEvent()) {
 			saveType = mCalendarUtils.saveContactEvent(mContact, contactEvent);
 		}
-		if (mContact.haveReminder()) {
-			mCalendarUtils.saveEventReminder(mContact, contactEvent);
+		if (mContact.haveReminder() && saveType != SaveType.NOTHING) {
+			saveType = mCalendarUtils.saveEventReminder(mContact, contactEvent);
 		}
 		if (saveType != SaveType.NOTHING) {
-			applicationPreferences.setContactEvent(contactEvent);
+			updateContactEvent(contactEvent);
 		}
+	}
+
+	/**
+	 * Update a contact event to the list of events.
+	 * 
+	 * @param model
+	 *            Contact model to be updated.
+	 */
+	private void updateContactEvent(ContactEvent model) {
+		List<ContactEvent> list = mApplication.getApplicationPreferences()
+				.getContactEvents();
+		List<ContactEvent> newList = new ArrayList<ContactEvent>(list);
+		int index = newList.indexOf(model);
+		if (index > -1) {
+			newList.set(index, model);
+		} else {
+			newList.add(model);
+		}
+		mApplication.getApplicationPreferences().replaceContactEvents(newList);
 	}
 }

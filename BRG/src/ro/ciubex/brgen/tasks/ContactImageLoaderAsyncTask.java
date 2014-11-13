@@ -20,16 +20,17 @@ package ro.ciubex.brgen.tasks;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
+import ro.ciubex.brgen.MainApplication;
 import ro.ciubex.brgen.model.Contact;
-import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.widget.BaseAdapter;
 
 /**
@@ -38,72 +39,75 @@ import android.widget.BaseAdapter;
  * @author Claudiu Ciobotariu
  * 
  */
-public class ContactImageLoaderAsyncTask extends
-		AsyncTask<Contact, Long, Boolean> {
+public class ContactImageLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
+	private static final String TAG = ContactImageLoaderAsyncTask.class
+			.getName();
+	private MainApplication mApplication;
+	private ContentResolver mContentResolver;
+	private BaseAdapter mAdapter;
 
-	private ContentResolver contentResolver;
-	private BaseAdapter adapter;
-
-	public ContactImageLoaderAsyncTask(Application application,
+	public ContactImageLoaderAsyncTask(MainApplication application,
 			BaseAdapter adapter) {
-		this.adapter = adapter;
-		contentResolver = application.getContentResolver();
+		mApplication = application;
+		mAdapter = adapter;
+		mContentResolver = application.getContentResolver();
 	}
 
 	/**
 	 * Method invoked on the background thread.
 	 */
 	@Override
-	protected Boolean doInBackground(Contact... contacts) {
-		Boolean flag = Boolean.FALSE;
-		if (contacts != null && contacts.length > 0) {
-			for (Contact contact : contacts) {
-				contact.setPictureLoading(true);
-				if (!contact.isPictureLoaded()) {
-					loadContactImage(contentResolver, contact);
-				}
-			}
-			flag = Boolean.TRUE;
-		}
-		return flag;
+	protected Boolean doInBackground(Void... params) {
+		loadContactsImages();
+		return Boolean.TRUE;
 	}
 
 	/**
-	 * Method invoked on the UI thread after the background computation
-	 * finishes.
+	 * This method is used to update the UI during this thread.
 	 */
 	@Override
-	protected void onPostExecute(Boolean result) {
-		super.onPostExecute(result);
-		if (Boolean.TRUE.equals(result)) {
-			adapter.notifyDataSetChanged();
+	protected void onProgressUpdate(Long... values) {
+		super.onProgressUpdate(values);
+		mAdapter.notifyDataSetChanged();
+	}
+
+	/**
+	 * Method used to load images for all contacts.
+	 * 
+	 */
+	private void loadContactsImages() {
+		List<Contact> contacts = mApplication.getContacts();
+		for (Contact contact : contacts) {
+			if (!contact.havePicture()) {
+				prepareContactPhoto(contact);
+			}
 		}
 	}
 
 	/**
-	 * Method used to load the bitmap picture for a contact.
+	 * Prepare contact photo bitmap.
 	 * 
-	 * @param cr
-	 *            The application ContentResolver.
 	 * @param contact
-	 *            The contact where should be loaded the picture.
+	 *            The contact object.
 	 */
-	private void loadContactImage(ContentResolver cr, Contact contact) {
+	private void prepareContactPhoto(Contact contact) {
 		Bitmap thumbnail = null;
 		InputStream input = null;
 		try {
-			Uri uri = ContentUris.withAppendedId(
-					ContactsContract.Contacts.CONTENT_URI, contact.getId());
-			input = ContactsContract.Contacts.openContactPhotoInputStream(cr,
-					uri);
+			input = ContactsContract.Contacts.openContactPhotoInputStream(
+					mContentResolver, ContentUris.withAppendedId(
+							ContactsContract.Contacts.CONTENT_URI,
+							contact.getId()));
 			if (input != null) {
-				thumbnail = BitmapFactory.decodeStream(input);
+				thumbnail = BitmapFactory.decodeStream(input, null, null);
 				if (thumbnail != null && thumbnail.getByteCount() > 0) {
-					contact.setPicture(thumbnail);
+					contact.setThumbnail(thumbnail);
+					contact.setPictureLoaded(true);
+					publishProgress(contact.getId());
 				}
 			}
 		} catch (Exception ex) {
-
+			Log.e(TAG, ex.getMessage(), ex);
 		} finally {
 			if (input != null) {
 				try {
@@ -112,6 +116,5 @@ public class ContactImageLoaderAsyncTask extends
 				}
 			}
 		}
-		contact.setPictureLoaded(true);
 	}
 }

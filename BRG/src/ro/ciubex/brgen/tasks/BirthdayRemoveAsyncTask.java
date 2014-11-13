@@ -19,6 +19,7 @@
 package ro.ciubex.brgen.tasks;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ro.ciubex.brgen.MainApplication;
 import ro.ciubex.brgen.model.Contact;
@@ -144,7 +145,22 @@ public class BirthdayRemoveAsyncTask extends AsyncTask<Void, Void, Boolean> {
 	private void removeFromContactEvents() {
 		ContactEvent contactEvent = new ContactEvent();
 		contactEvent.contactId = mContact.getId();
-		mApplication.getApplicationPreferences().removeContactEvent(
-				contactEvent);
+		removeContactEvent(contactEvent);
+	}
+
+	/**
+	 * Remove a contact model from the list of events.
+	 * 
+	 * @param model
+	 *            Contact model to be removed.
+	 */
+	private void removeContactEvent(ContactEvent model) {
+		List<ContactEvent> list = mApplication.getApplicationPreferences()
+				.getContactEvents();
+		int index = list.indexOf(model);
+		if (index > -1) {
+			list.remove(index);
+			mApplication.getApplicationPreferences().replaceContactEvents(list);
+		}
 	}
 }

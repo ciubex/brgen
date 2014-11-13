@@ -19,16 +19,19 @@
 package ro.ciubex.brgen.fragment;
 
 import ro.ciubex.brgen.R;
-import ro.ciubex.brgen.adapter.ContactListAdapter;
-import ro.ciubex.brgen.list.ContactListView;
+import ro.ciubex.brgen.adapter.OnListItemClickListener;
+import ro.ciubex.brgen.adapter.StickyListAdapter;
 import ro.ciubex.brgen.model.Constants;
 import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.tasks.BirthdayRemoveAsyncTask;
 import ro.ciubex.brgen.tasks.BirthdaysLoaderAsyncTask;
+import ro.ciubex.brgen.tasks.ContactImageLoaderAsyncTask;
 import ro.ciubex.brgen.tasks.DefaultAsyncTaskResult;
-import ro.ciubex.brgen.tasks.GenerateRemindersAsyncTask;
+import ro.ciubex.brgen.tasks.UpdateRemindersAsyncTask;
 import ro.ciubex.brgen.tasks.LoadContactsAsyncTask;
+import ro.ciubex.brgen.tasks.LoadPhonesContactAsyncTask;
 import ro.ciubex.brgen.tasks.SyncRemindersAsyncTask;
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.DialogInterface;
@@ -37,14 +40,13 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
-import android.widget.ListView;
 
 /**
  * @author Claudiu Ciobotariu
@@ -52,17 +54,21 @@ import android.widget.ListView;
  */
 public class ContactsListFragment extends BaseFragment implements
 		LoadContactsAsyncTask.Responder, BirthdayRemoveAsyncTask.Responder,
-		GenerateRemindersAsyncTask.Responder, SyncRemindersAsyncTask.Responder {
+		UpdateRemindersAsyncTask.Responder, SyncRemindersAsyncTask.Responder,
+		LoadPhonesContactAsyncTask.Responder, OnListItemClickListener {
+	private final static String TAG = ContactsListFragment.class.getName();
 	private EditText mFilterBox = null;
 	private CheckedTextView mCheckedAll;
-	private ListView mListView = null;
-	private ContactListAdapter mAdapter;
+	private StickyListHeadersListView mListView = null;
+	private StickyListAdapter mAdapter;
 	private DatePickerDialogFragment mDatePickerDlg;
 
 	private static final int REQUEST_CODE_CONTACT_EDITOR = 1;
 	private static final int CONFIRMATION_REMOVE_BIRTHDAY = 0;
-	private static final int CONFIRMATION_GEN_REMINDERS = 1;
+	private static final int CONFIRMATION_UPDATE_REMINDERS = 1;
 	private static final int CONFIRMATION_SYNC_REMINDERS = 2;
+	private static final int SELECT_CALL_CONTACT = 0;
+	private static final int SELECT_SEND_SMS = 1;
 
 	@Override
 	protected int getFragmentResourceId() {
@@ -78,6 +84,7 @@ public class ContactsListFragment extends BaseFragment implements
 	protected void initFragment() {
 		mDatePickerDlg = new DatePickerDialogFragment();
 		mDatePickerDlg.setMainApplication(mApplication);
+		mDatePickerDlg.setActivity(mActivity);
 		initFilterBox();
 		initListView();
 		prepareCheckedAll();
@@ -117,39 +124,23 @@ public class ContactsListFragment extends BaseFragment implements
 	 * Method used to initialize the list view.
 	 */
 	private void initListView() {
-		mListView = (ContactListView) mFragmentView
+		mListView = (StickyListHeadersListView) mFragmentView
 				.findViewById(R.id.contacts_list);
 		mListView
 				.setEmptyView(mFragmentView.findViewById(R.id.empty_list_view));
+
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View v,
 					int position, long id) {
-				if (position > -1 && position < mAdapter.getCount()) {
-					Contact contact = mAdapter.getItem(position);
-					if (contact != null && contact.haveBirthday()) {
-						contact.setChecked(!contact.isChecked());
-						mAdapter.notifyDataSetChanged();
-					}
-				}
-			}
-		});
-		mListView.setLongClickable(true);
-		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
 
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View v,
-					int position, long id) {
-				boolean isProcessed = false;
-				if (position > -1 && position < mAdapter.getCount()) {
-					Contact contact = mAdapter.getItem(position);
-					if (contact != null) {
-						isProcessed = true;
-						showItemDialogMenu(position);
-					}
+				final Contact contact = mAdapter.getItem(position);
+				if (contact != null) {
+					showItemDialogMenu(contact.getContactName(), contact
+							.haveBirthday() ? R.array.contact_item
+							: R.array.contact_item_no_birthday, position);
 				}
-				return isProcessed;
 			}
 		});
 	}
@@ -268,6 +259,7 @@ public class ContactsListFragment extends BaseFragment implements
 		if (Constants.OK == result.resultId) {
 			mApplication.showMessageInfo(mActivity, result.resultMessage);
 			new BirthdaysLoaderAsyncTask(mApplication, mAdapter).execute();
+			new ContactImageLoaderAsyncTask(mApplication, mAdapter).execute();
 		} else {
 			showMessageError(R.string.error_occurred, result.resultMessage);
 		}
@@ -277,12 +269,9 @@ public class ContactsListFragment extends BaseFragment implements
 	 * Method used to create the list view.
 	 */
 	private void preparePhoneContactsList() {
-		mAdapter = new ContactListAdapter(mApplication,
+		mAdapter = new StickyListAdapter(mApplication, this,
 				mApplication.getContacts(), mApplication.getDefaultLocale());
-		mListView.removeAllViewsInLayout();
 		mListView.setAdapter(mAdapter);
-		mListView.invalidateViews();
-		mListView.scrollBy(0, 0);
 		mListView.setFastScrollEnabled(mApplication.getApplicationPreferences()
 				.isEnabledFastScroll());
 	}
@@ -296,35 +285,114 @@ public class ContactsListFragment extends BaseFragment implements
 	 * This method show the popup menu when the user do a long click on a list
 	 * item
 	 * 
+	 * @param title
+	 *            The title of the popup menu.
+	 * @param itemsId
+	 *            The menu resource id to be displayed.
 	 * @param contactPosition
 	 *            The contact position where was made the long click
 	 */
-	private void showItemDialogMenu(final int contactPosition) {
+	private void showItemDialogMenu(String title, final int itemsId,
+			final int contactPosition) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-		builder.setTitle(R.string.contact_item_title);
-		builder.setItems(R.array.contact_item,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						switch (which) {
-						case 0:
-							editContactBirthday(contactPosition);
-							break;
-						case 1:
-							removeContactBirthday(contactPosition);
-							break;
-						case 2:
-							editContact(contactPosition);
-							break;
-						case 3:
-							regenerateReminder(contactPosition);
-							break;
-						case 4:
-							removeReminder(contactPosition);
-							break;
-						}
-					}
-				});
+		builder.setTitle(title);
+		builder.setItems(itemsId, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				onItemDialogMenuClick(itemsId, contactPosition, which);
+			}
+		});
 		builder.create().show();
+	}
+
+	/**
+	 * Based on the chosen above menu item call proper action.
+	 * 
+	 * @param itemsId
+	 *            The menu resource id.
+	 * @param contactPosition
+	 *            The contact position.
+	 * @param which
+	 *            The menu item position.
+	 */
+	private void onItemDialogMenuClick(int itemsId, int contactPosition,
+			int which) {
+		switch (itemsId) {
+		case R.array.contact_item:
+			onClickItemWithBirthday(contactPosition, which);
+			break;
+		case R.array.contact_item_no_birthday:
+			onClickItemNoBirthday(contactPosition, which);
+			break;
+		case R.array.contact_picture:
+			onClickItemPicture(contactPosition, which);
+			break;
+		}
+	}
+
+	/**
+	 * Click on a contact with birthday information.
+	 * 
+	 * @param contactPosition
+	 *            The contact position.
+	 * @param which
+	 *            Which selected menu item.
+	 */
+	private void onClickItemWithBirthday(int contactPosition, int which) {
+		switch (which) {
+		case 0:
+			editContactBirthday(contactPosition);
+			break;
+		case 1:
+			removeContactBirthday(contactPosition);
+			break;
+		case 2:
+			editContact(contactPosition);
+			break;
+		case 3:
+			updateReminder(contactPosition);
+			break;
+		case 4:
+			removeReminder(contactPosition);
+			break;
+		}
+	}
+
+	/**
+	 * Click on a contact without birthday information.
+	 * 
+	 * @param contactPosition
+	 *            The contact position.
+	 * @param which
+	 *            Which selected menu item.
+	 */
+	private void onClickItemNoBirthday(int contactPosition, int which) {
+		switch (which) {
+		case 0:
+			editContactBirthday(contactPosition);
+			break;
+		case 1:
+			editContact(contactPosition);
+			break;
+		}
+	}
+
+	/**
+	 * Click on a contact picture.
+	 * 
+	 * @param contactPosition
+	 *            The contact position.
+	 * @param which
+	 *            Which selected menu item.
+	 */
+	private void onClickItemPicture(int contactPosition, int which) {
+		switch (which) {
+		case 0:
+			onSelectContact(contactPosition, SELECT_CALL_CONTACT);
+			break;
+		case 1:
+			onSelectContact(contactPosition, SELECT_SEND_SMS);
+			break;
+		}
 	}
 
 	/**
@@ -335,10 +403,12 @@ public class ContactsListFragment extends BaseFragment implements
 	 */
 	private void editContactBirthday(int contactPosition) {
 		Contact contact = mAdapter.getItem(contactPosition);
-		mDatePickerDlg.setContact(contact);
-		mDatePickerDlg.setAdapter(mAdapter);
-		mDatePickerDlg.show(getFragmentManager().beginTransaction(),
-				"date_dialog");
+		if (contact != null) {
+			mDatePickerDlg.setContact(contact);
+			mDatePickerDlg.setAdapter(mAdapter);
+			mDatePickerDlg.show(getFragmentManager().beginTransaction(),
+					"date_dialog");
+		}
 	}
 
 	/**
@@ -384,18 +454,17 @@ public class ContactsListFragment extends BaseFragment implements
 	}
 
 	/**
-	 * (Re)Generate the reminder for selected contact.
+	 * Update the reminder for selected contact.
 	 * 
 	 * @param contactPosition
 	 */
-	private void regenerateReminder(int contactPosition) {
+	private void updateReminder(int contactPosition) {
 		Contact contact = mAdapter.getItem(contactPosition);
 		if (contact != null) {
 			if (contact.haveBirthday()) {
 				if (mApplication.getApplicationPreferences()
 						.haveCalendarSelected()) {
-					contact.setChecked(true);
-					new GenerateRemindersAsyncTask(this, mApplication,
+					new UpdateRemindersAsyncTask(this, mApplication,
 							mAdapter, contact).execute();
 				} else {
 					showMessageError(R.string.attention,
@@ -421,7 +490,7 @@ public class ContactsListFragment extends BaseFragment implements
 		if (contact != null) {
 			if (mApplication.getApplicationPreferences().haveCalendarSelected()) {
 				contact.setChecked(false);
-				new GenerateRemindersAsyncTask(this, mApplication, mAdapter,
+				new UpdateRemindersAsyncTask(this, mApplication, mAdapter,
 						contact).execute();
 			} else {
 				showMessageError(R.string.attention, R.string.select_a_calendar);
@@ -430,21 +499,21 @@ public class ContactsListFragment extends BaseFragment implements
 	}
 
 	/**
-	 * Method invoked when is started the generate reminders thread
+	 * Method invoked when is started the update reminders thread
 	 */
 	@Override
-	public void startGenerateReminders() {
-		mApplication.showProgressDialog(mActivity, R.string.generate_reminders);
+	public void startUpdateReminders() {
+		mApplication.showProgressDialog(mActivity, R.string.update_reminders);
 	}
 
 	/**
-	 * Method invoked at the end of generate reminders thread
+	 * Method invoked at the end of update reminders thread
 	 * 
 	 * @param result
 	 *            The process result
 	 */
 	@Override
-	public void endGenerateReminders(DefaultAsyncTaskResult result) {
+	public void endUpdateReminders(DefaultAsyncTaskResult result) {
 		mApplication.hideProgressDialog();
 		if (Constants.OK == result.resultId) {
 			mApplication.showMessageInfo(mActivity, result.resultMessage);
@@ -479,8 +548,8 @@ public class ContactsListFragment extends BaseFragment implements
 		case CONFIRMATION_REMOVE_BIRTHDAY:
 			doRemoveContactBirthday((Contact) anObject);
 			break;
-		case CONFIRMATION_GEN_REMINDERS:
-			new GenerateRemindersAsyncTask(this, mApplication, mAdapter,
+		case CONFIRMATION_UPDATE_REMINDERS:
+			new UpdateRemindersAsyncTask(this, mApplication, mAdapter,
 					mApplication.getContactsAsArray()).execute();
 			break;
 		case CONFIRMATION_SYNC_REMINDERS:
@@ -515,14 +584,14 @@ public class ContactsListFragment extends BaseFragment implements
 	}
 
 	/**
-	 * Save reminders for selected contacts.
+	 * Update reminders for all contacts.
 	 */
-	public void saveReminders() {
+	public void updateAllReminders() {
 		if (mApplication.getApplicationPreferences().haveCalendarSelected()) {
-			showConfirmationDialog(R.string.generate_reminders_title,
+			showConfirmationDialog(R.string.update_reminders_title,
 					mApplication
-							.getString(R.string.generate_reminders_question),
-					CONFIRMATION_GEN_REMINDERS, null);
+							.getString(R.string.update_reminders_question),
+					CONFIRMATION_UPDATE_REMINDERS, null);
 		} else {
 			showMessageError(R.string.attention, R.string.select_a_calendar);
 		}
@@ -564,6 +633,181 @@ public class ContactsListFragment extends BaseFragment implements
 		mApplication.hideProgressDialog();
 		if (result.resultMessage != null) {
 			mApplication.showMessageInfo(mActivity, result.resultMessage);
+		}
+	}
+
+	/**
+	 * Method invoked when the used chose the "Call" or "Send SMS" menu item.
+	 * 
+	 * @param contactPosition
+	 *            The contact position.
+	 * @param taskId
+	 *            The ID of the task, call or send SMS.
+	 */
+	private void onSelectContact(int contactPosition, int taskId) {
+		Contact contact = (Contact) mAdapter.getItem(contactPosition);
+		if (contact != null) {
+			if (contact.havePhoneNumbers()) {
+				onSelectContact(contact, taskId);
+			} else {
+				new LoadPhonesContactAsyncTask(this, contact, taskId).execute();
+			}
+		}
+	}
+
+	/**
+	 * Method used to prepare the contact and the number for the action: SMS or
+	 * Call.
+	 * 
+	 * @param contact
+	 *            The chosen contact.
+	 * @param taskId
+	 *            The task ID: SMS or Call.
+	 */
+	private void onSelectContact(Contact contact, int taskId) {
+		String[] arr = contact.getPhoneNumbers();
+		if (arr.length == 1) {
+			onSelectContact(contact, arr[0], taskId);
+		} else {
+			choseContactPhone(contact, taskId);
+		}
+	}
+
+	/**
+	 * This method will display a list of phone numbers for chosen contact.
+	 * 
+	 * @param contact
+	 *            The chosen contact.
+	 * @param taskId
+	 *            The task ID: SMS or Call.
+	 */
+	private void choseContactPhone(final Contact contact, final int taskId) {
+		new AlertDialog.Builder(mActivity)
+				.setTitle(R.string.phone_select)
+				.setItems(contact.getPhoneNumbers(),
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								onSelectContact(contact,
+										contact.getPhoneNumbers()[which],
+										taskId);
+							}
+						}).create().show();
+	}
+
+	/**
+	 * Method used to launch proper action based on the task id.
+	 * 
+	 * @param contact
+	 *            The chosen contact.
+	 * @param phoneNumber
+	 *            The phone number.
+	 * @param taskId
+	 *            Task ID: SMS or Call.
+	 */
+	private void onSelectContact(Contact contact, String phoneNumber, int taskId) {
+		switch (taskId) {
+		case SELECT_CALL_CONTACT:
+			doContactCall(contact, phoneNumber);
+			break;
+		case SELECT_SEND_SMS:
+			doContactSendSMS(contact, phoneNumber);
+			break;
+		}
+	}
+
+	/**
+	 * Call a contact using provided number.
+	 * 
+	 * @param contact
+	 *            The contact to be calling.
+	 * @param number
+	 *            The contact phone number.
+	 */
+	private void doContactCall(Contact contact, String number) {
+		Uri uri = Uri.parse("tel:" + number);
+		try {
+			Intent intent = new Intent(Intent.ACTION_DIAL);
+			intent.setData(uri);
+			startActivity(intent);
+		} catch (Exception e) {
+			showMessageError(R.string.error_occurred,
+					getString(R.string.phone_error_call, number, e));
+			Log.e(TAG, e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Send a SMS message to the selected contact.
+	 * 
+	 * @param contact
+	 *            The selected contact.
+	 * @param number
+	 *            The number of selected contact.
+	 */
+	private void doContactSendSMS(Contact contact, String number) {
+		Uri uri = Uri.parse("sms:" + number);
+		String message = mApplication.getApplicationPreferences()
+				.getSMSMessage(contact.getContactName());
+		try {
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+			intent.setType("text/plain");
+			intent.setData(uri);
+			intent.putExtra(Intent.EXTRA_TEXT, message);
+			intent.putExtra("sms_body", message);
+			startActivity(intent);
+		} catch (Exception e) {
+			showMessageError(R.string.error_occurred,
+					getString(R.string.phone_error_sms, number, e));
+			Log.e(TAG, e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * Method invoked when the phone contact loader is started.
+	 */
+	@Override
+	public void startLoadPhonesContact() {
+		mApplication.showProgressDialog(mActivity, R.string.loading_wait);
+	}
+
+	/**
+	 * Method invoked at the end of the phone contact loader.
+	 */
+	@Override
+	public void endLoadPhonesContact(DefaultAsyncTaskResult result) {
+		mApplication.hideProgressDialog();
+		if (result.resultId != Constants.OK && result.resultMessage != null) {
+			mApplication.showMessageInfo(mActivity, result.resultMessage);
+		} else {
+			Contact contact = (Contact) result.object;
+			onSelectContact(contact, result.taskId);
+		}
+	}
+
+	/**
+	 * Method invoked when the contact image is clicked.
+	 */
+	@Override
+	public void onContactImageClick(int position) {
+		Contact contact = (Contact) mAdapter.getItem(position);
+		if (contact != null) {
+			showItemDialogMenu(contact.getContactName(),
+					R.array.contact_picture, position);
+		}
+	}
+
+	/**
+	 * Method invoked when the check box image is clicked.
+	 */
+	@Override
+	public void onCheckBoxClick(int position) {
+		Contact contact = (Contact) mAdapter.getItem(position);
+		if (contact != null && contact.haveBirthday()) {
+			contact.setChecked(!contact.isChecked());
+			mAdapter.notifyDataSetChanged();
 		}
 	}
 }

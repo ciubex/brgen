@@ -28,6 +28,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -39,6 +40,7 @@ import android.widget.TextView;
  * 
  */
 public class AboutFragment extends BaseFragment {
+	private final static String TAG = AboutFragment.class.getName();
 	private AlertDialog.Builder donate;
 
 	@Override
@@ -79,14 +81,14 @@ public class AboutFragment extends BaseFragment {
 			version = mActivity.getPackageManager().getPackageInfo(
 					mActivity.getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
-			e.printStackTrace();
+			Log.e(TAG, e.getMessage(), e);
 		}
 		aboutText = getString(R.string.about_text, version);
 		return aboutText;
 	}
 
 	/**
-	 * Method used to initialize the buttons.
+	 * Method used to initialize the buttons. 
 	 */
 	private void initButtons() {
 		Button bLicense = (Button) mFragmentView.findViewById(R.id.license);
@@ -94,7 +96,16 @@ public class AboutFragment extends BaseFragment {
 
 			@Override
 			public void onClick(View v) {
-				onClickLicense();
+				onClickLicense(LicenseFragment.LICENCE);
+			}
+		});
+		
+		Button bLicense20 = (Button) mFragmentView.findViewById(R.id.license20);
+		bLicense20.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				onClickLicense(LicenseFragment.LICENCE_2_0);
 			}
 		});
 
@@ -115,8 +126,8 @@ public class AboutFragment extends BaseFragment {
 	/**
 	 * Method invoked when is pressed the license button.
 	 */
-	private void onClickLicense() {
-		mActivity.displayView(MainActivity.FRG_LICENSE);
+	private void onClickLicense(int contentId) {
+		mActivity.displayView(MainActivity.FRG_LICENSE, contentId);
 	}
 
 	/**

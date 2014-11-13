@@ -28,6 +28,7 @@ import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.model.ContactEvent;
 import ro.ciubex.brgen.util.ApplicationPreferences;
 import ro.ciubex.brgen.util.CalendarUtils;
+import ro.ciubex.brgen.util.Utilities;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -129,7 +130,7 @@ public class SyncRemindersAsyncTask extends
 		if (mGenerated.isEmpty()) {
 			result.resultMessage = mApplication.getString(R.string.sync_no);
 		} else {
-			mApplication.getApplicationPreferences().setContactEvents(
+			mApplication.getApplicationPreferences().replaceContactEvents(
 					mGenerated);
 			if (mGenerated.size() == 1) {
 				result.resultMessage = mApplication
@@ -172,9 +173,7 @@ public class SyncRemindersAsyncTask extends
 			Log.e(TAG, "syncContactEvents Exception: " + ex.getMessage(), ex);
 			bool = false;
 		} finally {
-			if (cursor != null && !cursor.isClosed()) {
-				cursor.close();
-			}
+			Utilities.closeCursor(cursor);
 		}
 		return bool;
 	}
@@ -234,9 +233,7 @@ public class SyncRemindersAsyncTask extends
 			Log.e(TAG, "syncContactReminders Exception: " + ex.getMessage(), ex);
 			bool = false;
 		} finally {
-			if (cursor != null && !cursor.isClosed()) {
-				cursor.close();
-			}
+			Utilities.closeCursor(cursor);
 		}
 		return bool;
 	}

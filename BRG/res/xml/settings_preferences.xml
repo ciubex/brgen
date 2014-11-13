@@ -27,6 +27,16 @@
             android:key="calendarList"
             android:summary="@string/select_calendar"
             android:title="@string/str_calendar" />
+
+        <EditTextPreference
+            android:defaultValue="@string/sms_template_model"
+            android:key="smsTemplate"
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:minLines="3"
+            android:maxLines="10"
+            android:summary="@string/sms_template_desc"
+            android:title="@string/sms_template_title" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/reminder_settings" >
         <EditTextPreference

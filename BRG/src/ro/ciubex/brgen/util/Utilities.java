@@ -25,6 +25,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import android.database.Cursor;
+import android.util.Log;
+
 /**
  * This contain commons utilities methods.
  * 
@@ -32,6 +35,8 @@ import java.util.Locale;
  * 
  */
 public class Utilities {
+	private final static String TAG = Utilities.class.getName();
+
 	/**
 	 * This method fill format a string by adding a zero on the from if the
 	 * number is less than ten.
@@ -175,5 +180,21 @@ public class Utilities {
 			list.add(item);
 		}
 		return list;
+	}
+
+	/**
+	 * Close a DB cursor.
+	 * 
+	 * @param cursor
+	 *            The DB cursor to be closed.
+	 */
+	public static void closeCursor(Cursor cursor) {
+		try {
+			if (cursor != null && !cursor.isClosed()) {
+				cursor.close();
+			}
+		} catch (Exception e) {
+			Log.e(TAG, e.getMessage(), e);
+		}
 	}
 }

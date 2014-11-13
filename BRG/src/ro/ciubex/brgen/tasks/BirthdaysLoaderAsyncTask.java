@@ -18,6 +18,8 @@
  */
 package ro.ciubex.brgen.tasks;
 
+import java.util.List;
+
 import ro.ciubex.brgen.MainApplication;
 import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.util.Utilities;
@@ -25,6 +27,7 @@ import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.widget.BaseAdapter;
 
 /**
@@ -34,6 +37,7 @@ import android.widget.BaseAdapter;
  * 
  */
 public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
+	private static final String TAG = BirthdaysLoaderAsyncTask.class.getName();
 	private MainApplication mApplication;
 	private ContentResolver mContentResolver;
 	private BaseAdapter mAdapter;
@@ -50,20 +54,7 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 	 */
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		for (Contact contact : mApplication.getContacts()) {
-			String birthday = null;
-			if (!contact.isLoadedBirthday()) {
-				contact.setLoadedBirthday(true);
-				long contactId = contact.getId();
-				birthday = getContactBirthday(mContentResolver, contactId);
-				if (birthday != null) {
-					contact.setBirthday(Utilities.parseCalendarString(
-							mApplication.getDefaultLocale(),
-							mApplication.getDateFormat(), birthday));
-					publishProgress(contactId);
-				}
-			}
-		}
+		getContactsBirthdays();
 		return Boolean.TRUE;
 	}
 
@@ -77,18 +68,11 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 	}
 
 	/**
-	 * This method is used to load for the birthday for a contact.
-	 * 
-	 * @param cr
-	 *            The application ContentResolver
-	 * @param contactId
-	 *            The contact id.
-	 * @return The birthday information. If the contact don't have birthday info
-	 *         will be returned NULL.
+	 * This method is used to load the birthdays for all contacts.
 	 */
-	private String getContactBirthday(ContentResolver cr, long contactId) {
-		String birthday = null;
+	private void getContactsBirthdays() {
 		Cursor cursor = null;
+		List<Contact> contacts = mApplication.getContacts();
 		try {
 
 			String[] projection = new String[] {
@@ -97,31 +81,64 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 					ContactsContract.Data.MIMETYPE,
 					ContactsContract.CommonDataKinds.Event.TYPE };
 
-			String where = ContactsContract.Data.CONTACT_ID + "=?" + " AND "
-					+ ContactsContract.Data.MIMETYPE + "=?" + " AND "
+			String where = ContactsContract.Data.MIMETYPE + "=?" + " AND "
 					+ ContactsContract.CommonDataKinds.Event.TYPE + "=?";
 
 			String[] selectionArgs = new String[] {
-					String.valueOf(contactId),
 					ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE,
 					String.valueOf(ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY) };
 
 			String sortOrder = null;
 
-			cursor = cr.query(ContactsContract.Data.CONTENT_URI, projection,
-					where, selectionArgs, sortOrder);
-			if (cursor.moveToNext()) {
-				birthday = cursor
-						.getString(cursor
-								.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE));
+			cursor = mContentResolver.query(ContactsContract.Data.CONTENT_URI,
+					projection, where, selectionArgs, sortOrder);
+			if (cursor != null) {
+				prepareContactsBirtdays(cursor, contacts);
 			}
 		} catch (Exception ex) {
+			Log.e(TAG, ex.getMessage(), ex);
 		} finally {
-			if (cursor != null && !cursor.isClosed()) {
-				cursor.close();
-			}
+			Utilities.closeCursor(cursor);
 		}
-		return birthday;
 	}
 
+	/**
+	 * Prepare each contact with the birthday info.
+	 * 
+	 * @param cursor
+	 *            Cursor with the DB connection.
+	 * @param contacts
+	 *            List of contacts.
+	 */
+	private void prepareContactsBirtdays(Cursor cursor, List<Contact> contacts) {
+		Long contactId = null;
+		String birthday = null;
+		while (cursor.moveToNext()) {
+			contactId = cursor.getLong(cursor
+					.getColumnIndex(ContactsContract.Data.CONTACT_ID));
+			birthday = cursor
+					.getString(cursor
+							.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE));
+
+			for (Contact contact : contacts) {
+				if (contactId == contact.getId()) {
+					if (birthday != null && birthday.trim().length() > 0) {
+						contact.setBirthday(Utilities.parseCalendarString(
+								mApplication.getDefaultLocale(),
+								mApplication.getDateFormat(), birthday));
+					}
+					contact.setLoadedBirthday(true);
+					publishProgress(contactId);
+					break;
+				}
+			}
+		}
+		// lets change the loading flag for all contacts
+		for (Contact contact : contacts) {
+			if (!contact.isLoadedBirthday()) {
+				contact.setLoadedBirthday(true);
+				publishProgress(contactId);
+			}
+		}
+	}
 }

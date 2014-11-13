@@ -21,6 +21,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/license" />
+    
+    <Button
+        android:id="@+id/license20"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/license_2_0" />
 
     <Button
         android:id="@+id/donate"

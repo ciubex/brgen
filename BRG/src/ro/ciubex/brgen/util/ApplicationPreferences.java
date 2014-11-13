@@ -175,6 +175,19 @@ public class ApplicationPreferences {
 	}
 
 	/**
+	 * Get the birthday SMS message.
+	 * 
+	 * @param contactName
+	 *            The contact name used on the SMS message.
+	 * @return The birthday SMS message.
+	 */
+	public String getSMSMessage(String contactName) {
+		String format = mApplication.getString(R.string.sms_template_model);
+		format = mSharedPreferences.getString("smsTemplate", format);
+		return String.format(format, contactName);
+	}
+
+	/**
 	 * Get reminder type.
 	 * 
 	 * @return Reminder type.
@@ -317,7 +330,7 @@ public class ApplicationPreferences {
 	 * @param list
 	 *            List of contact events.
 	 */
-	public void setContactEvents(List<ContactEvent> list) {
+	public void replaceContactEvents(List<ContactEvent> list) {
 		Editor editor = mSharedPreferences.edit();
 		if (list.size() > 0) {
 			StringBuilder sb = new StringBuilder();
@@ -332,39 +345,6 @@ public class ApplicationPreferences {
 			editor.remove(CONTACT_EVENTS);
 		}
 		editor.commit();
-	}
-
-	/**
-	 * Save a contact event to the list of events.
-	 * 
-	 * @param model
-	 *            Contact model to be saved.
-	 */
-	public void setContactEvent(ContactEvent model) {
-		List<ContactEvent> list = getContactEvents();
-		List<ContactEvent> newList = new ArrayList<ContactEvent>(list);
-		int index = newList.indexOf(model);
-		if (index > -1) {
-			newList.set(index, model);
-		} else {
-			newList.add(model);
-		}
-		setContactEvents(newList);
-	}
-
-	/**
-	 * Remove a contact model from the list of events.
-	 * 
-	 * @param model
-	 *            Contact model to be removed.
-	 */
-	public void removeContactEvent(ContactEvent model) {
-		List<ContactEvent> list = getContactEvents();
-		int index = list.indexOf(model);
-		if (index > -1) {
-			list.remove(index);
-			setContactEvents(list);
-		}
 	}
 
 	/**

@@ -8,9 +8,9 @@
     <string name="please_wait">Please wait&#8230;</string>
     <string name="loading_wait">Loading&#8230;</string>
     <string name="loading_pictures">Loading pictures&#8230;</string>
-    <string name="generate_reminders">Generate reminders&#8230;</string>
-    <string name="generate_reminders_title">Generate reminders</string>
-    <string name="generate_reminders_question">Do you want to generate reminders for selected contacts?</string>
+    <string name="update_reminders">Update reminders&#8230;</string>
+    <string name="update_reminders_title">Update all reminders</string>
+    <string name="update_reminders_question">Do you want to update reminders for all contacts?</string>
     <string name="filter">Filter</string>
     <string name="filtering">Filtering&#8230;</string>
     <string name="select_all">Select all</string>
@@ -22,7 +22,7 @@
     <string name="loading_birthdays">Loading birthdays&#8230;</string>
     <string name="no_birthdays">Your contacts do not contain birthdays</string>
     <string name="birthdays_loaded">Were loaded %d birthdays</string>
-    <string name="no_calendar">No access to any calendar to generate reminders.</string>
+    <string name="no_calendar">No access to any calendar to update reminders.</string>
     <string name="no_calendar_access">No access to any calendar to get reminders.</string>
     <string name="select_a_calendar">Select a calendar from settings first!</string>
     <string name="reminder_deleted">Deleted one reminder.</string>
@@ -31,7 +31,8 @@
     <string name="reminders_inserted">Inserted %d reminders.</string>
     <string name="reminder_updated">Updated one reminder.</string>
     <string name="reminders_updated">Updated %d reminders.</string>
-    <string name="no_changes">Nothig was changed.</string>
+    <string name="birthday_updated">Birthday updated.</string>
+    <string name="no_changes">No update was required.</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
@@ -57,19 +58,26 @@
 
     <!-- Menu -->
     <string name="action_back">Back</string>
-    <string name="action_generate">Generate reminders</string>
+    <string name="action_update_reminders">Update all reminders</string>
     <string name="action_sync">Synchronize reminders</string>
     <string name="action_reload">Reload</string>
     <string name="action_settings">Settings</string>
     <string name="action_exit">Exit</string>
-    <string name="contact_item_title">Choose to edit:</string>
 
     <string-array name="contact_item">
         <item>Edit Birthday</item>
         <item>Remove Birthday</item>
-        <item>Contact</item>
-        <item>(Re)Generate reminder</item>
+        <item>Edit Contact</item>
+        <item>Update reminder</item>
         <item>Remove reminder</item>
+    </string-array>
+    <string-array name="contact_item_no_birthday">
+        <item>Add Birthday</item>
+        <item>Edit Contact</item>
+    </string-array>
+    <string-array name="contact_picture">
+        <item>Call</item>
+        <item>Send Birthday SMS</item>
     </string-array>
 
     <!-- Slide Menu Items -->
@@ -133,6 +141,13 @@
     <string-array name="choose_calendar_values">
         <item>none</item>
     </string-array>
+    <string name="sms_template_title">SMS Template</string>
+    <string name="sms_template_desc">Define a template for birthday\'s messages</string>
+    <string name="sms_template_model">Happy Birthday, %s!\nI wish you the best birthday ever!</string>
+    <string name="phone_select">Select a phone number:</string>
+    <string name="phone_list_empty">Your contact %s do not have a phone number!</string>
+    <string name="phone_error_call">Cannot make the call to number: %1$s, error: %2$s</string>
+    <string name="phone_error_sms">Cannot send the SMS to number: %1$s, error: %2$s</string>
 
     <string name="str_reminderTitleFormat">Reminder title format</string>
     <string name="str_reminderDescriptionFormat">Reminder description format</string>
@@ -147,7 +162,7 @@
     <string name="str_when_start">When to start</string>
     <string name="str_when_end">When to end</string>
     <string name="reminderStartTime">09:00</string>
-    <string name="reminderEndTime">23:59</string>
+    <string name="reminderEndTime">10:00</string>
     <string name="reminderMethod">Pop-up / Alert</string>
     <string name="reminderBeforeMinutes">Calendar default</string>
     <string name="str_reminderType">Reminder type</string>
@@ -251,7 +266,6 @@ See available reminder properties on the settings menu.<br/>
 <i>Observations:</i><br/>
 The application was tested only with google contacts and calendars.<br/>
 - When is started the application is loading all your available contacts, but the birthdays and images are loaded in background and appear when are loaded in this time this application could become lagging.<br/>
-Unfortunately the application \"lose\" the generated reminders when is reinstalled, but generated reminders remain stored on the calendar, that\'s because the contacts and reminders will have different ID\'s and can not be identified by this application, I did not find a way to do that. So, if the user chose to generate reminders, then new ones will be regenerated.<br/>
 <br/>
 This application use Treetog ArtWork\'s free icons from: <a href="http://www.iconarchive.com/artist/treetog.html">http://www.iconarchive.com/artist/treetog.html</a>.<br/>
 The sources of this application are stored at: <a href="https://code.google.com/p/brgen/">https://code.google.com/p/brgen/</a>.<br/>
@@ -261,6 +275,7 @@ Thank you for using this application!<br/>]]>
 
     <!-- License -->
     <string name="license">License</string>
+    <string name="license_2_0">Apache License, v2.0</string>
 
     <!-- Donation -->
     <string name="donate">Donate</string>
