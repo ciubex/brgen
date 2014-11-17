@@ -178,9 +178,19 @@ public class Contact implements Comparable<Contact> {
 		builder.append(", ");
 		builder.append(mId);
 		builder.append(", ");
-		builder.append(mBirthday);
+		prepareBirthdayString(builder);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	private void prepareBirthdayString(StringBuilder builder) {
+		if (mBirthday == null) {
+			builder.append("no birthday");
+		} else {
+			builder.append(mBirthday.get(Calendar.DAY_OF_MONTH)).append('.');
+			builder.append(mBirthday.get(Calendar.MONTH)+1).append('.');
+			builder.append(mBirthday.get(Calendar.YEAR));
+		}
 	}
 
 	public boolean isPictureLoaded() {
@@ -209,7 +219,7 @@ public class Contact implements Comparable<Contact> {
 	public void toggleChecked() {
 		mChecked = !mChecked;
 	}
-	
+
 	public boolean isModified() {
 		if (!mChecked) {
 			return haveReminder();

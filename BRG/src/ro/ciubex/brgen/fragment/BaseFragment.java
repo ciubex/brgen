@@ -39,6 +39,7 @@ public abstract class BaseFragment extends Fragment {
 	protected MainActivity mActivity;
 	protected View mFragmentView;
 	protected int mContentId;
+	protected DatePickerDialogFragment mDatePickerDlg;
 
 	public BaseFragment() {
 	}
@@ -83,6 +84,9 @@ public abstract class BaseFragment extends Fragment {
 	}
 
 	protected void initFragment() {
+		mDatePickerDlg = new DatePickerDialogFragment();
+		mDatePickerDlg.setMainApplication(mApplication);
+		mDatePickerDlg.setActivity(mActivity);
 	}
 
 	/**

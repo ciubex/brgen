@@ -33,6 +33,7 @@
     <string name="reminders_updated">Updated %d reminders.</string>
     <string name="birthday_updated">Birthday updated.</string>
     <string name="no_changes">No update was required.</string>
+    <string name="birthdays_not_loaded">Contacts birthdays are not loaded yet, try again later!</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
@@ -83,6 +84,7 @@
     <!-- Slide Menu Items -->
     <string-array name="slide_menu_items">
         <item>Contacts</item>
+        <item>Birthdays</item>
         <item>Settings</item>
         <item>About</item>
         <item>License</item>
@@ -90,6 +92,7 @@
 
     <!-- Slide Menu Icons -->
     <array name="slide_menu_icons">
+        <item>@drawable/contacts</item>
         <item>@drawable/contacts</item>
         <item>@drawable/settings</item>
         <item>@drawable/about</item>
@@ -125,6 +128,25 @@
         <item>Y</item>
         <item>Z</item>
     </array>
+    <array name="sections_months">
+		<item>January</item>
+		<item>February</item>
+		<item>March</item>
+		<item>April</item>
+		<item>May</item>
+		<item>June</item>
+		<item>July</item>
+		<item>August</item>
+		<item>September</item>
+		<item>October</item>
+		<item>November</item>
+		<item>December</item>
+		<item>Undecimber</item>
+    </array>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="this_month">This month</string>
+    <string name="next_month">Next month</string>
 
     <!-- Settings -->
     <string name="general_settings">General settings</string>

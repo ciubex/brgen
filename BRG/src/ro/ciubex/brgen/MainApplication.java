@@ -45,7 +45,9 @@ public class MainApplication extends Application {
 	private ApplicationPreferences mApplicationPreferences;
 	private CalendarUtils mCalendarUtils;
 	private List<Contact> mContacts;
+	private List<Contact> mBirthdays;
 	private boolean mContactsLoaded;
+	private boolean mBirthdaysLoaded;
 	private ProgressDialog mProgressDialog;
 
 	/**
@@ -55,9 +57,11 @@ public class MainApplication extends Application {
 	 */
 	@Override
 	public void onCreate() {
-		mContactsLoaded = false;
-		mContacts = new ArrayList<Contact>();
 		mApplicationPreferences = new ApplicationPreferences(this);
+		mContactsLoaded = false;
+		mBirthdaysLoaded = false;
+		mContacts = new ArrayList<Contact>();
+		mBirthdays = new ArrayList<Contact>();
 		mCalendarUtils = new CalendarUtils(this);
 	}
 
@@ -68,6 +72,15 @@ public class MainApplication extends Application {
 	 */
 	public List<Contact> getContacts() {
 		return mContacts;
+	}
+
+	/**
+	 * This list contain contacts with birthdays.
+	 * 
+	 * @return the birthdays list.
+	 */
+	public List<Contact> getBirthdays() {
+		return mBirthdays;
 	}
 
 	/**
@@ -97,6 +110,15 @@ public class MainApplication extends Application {
 	 */
 	public boolean isContactsLoaded() {
 		return mContactsLoaded;
+	}
+
+	/**
+	 * Check if the birthdays list is loaded.
+	 * 
+	 * @return the BirthdaysLoaded flag.
+	 */
+	public boolean isBirthdaysLoaded() {
+		return mBirthdaysLoaded;
 	}
 
 	/**
@@ -137,6 +159,16 @@ public class MainApplication extends Application {
 	 */
 	public void setContactsLoaded(boolean contactsLoaded) {
 		this.mContactsLoaded = contactsLoaded;
+	}
+
+	/**
+	 * Set the flag used to check if birthdays list is loaded.
+	 * 
+	 * @param birthdaysLoaded
+	 *            the birthdaysLoaded to set
+	 */
+	public void setBirthdaysLoaded(boolean birthdaysLoaded) {
+		this.mBirthdaysLoaded = birthdaysLoaded;
 	}
 
 	/**
@@ -219,7 +251,7 @@ public class MainApplication extends Application {
 			Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 		}
 	}
-	
+
 	/**
 	 * Method used to obtain the age based on a birthday calendar.
 	 * 
@@ -253,7 +285,7 @@ public class MainApplication extends Application {
 	public CalendarUtils getCalendarUtils() {
 		return mCalendarUtils;
 	}
-	
+
 	/**
 	 * Check for pro version.
 	 * 

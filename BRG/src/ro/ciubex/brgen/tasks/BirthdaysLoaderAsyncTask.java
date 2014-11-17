@@ -68,11 +68,29 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 	}
 
 	/**
+	 * Method invoked on the UI thread before the task is executed.
+	 */
+	@Override
+	protected void onPreExecute() {
+		super.onPreExecute();
+		mApplication.setBirthdaysLoaded(false);
+	}
+
+	/**
+	 * Method invoked on the UI thread after the background computation
+	 * finishes.
+	 */
+	@Override
+	protected void onPostExecute(Boolean result) {
+		super.onPostExecute(result);
+		mApplication.setBirthdaysLoaded(true);
+	}
+
+	/**
 	 * This method is used to load the birthdays for all contacts.
 	 */
 	private void getContactsBirthdays() {
 		Cursor cursor = null;
-		List<Contact> contacts = mApplication.getContacts();
 		try {
 
 			String[] projection = new String[] {
@@ -93,7 +111,7 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 			cursor = mContentResolver.query(ContactsContract.Data.CONTENT_URI,
 					projection, where, selectionArgs, sortOrder);
 			if (cursor != null) {
-				prepareContactsBirtdays(cursor, contacts);
+				prepareContactsBirtdays(cursor);
 			}
 		} catch (Exception ex) {
 			Log.e(TAG, ex.getMessage(), ex);
@@ -107,12 +125,12 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 	 * 
 	 * @param cursor
 	 *            Cursor with the DB connection.
-	 * @param contacts
-	 *            List of contacts.
 	 */
-	private void prepareContactsBirtdays(Cursor cursor, List<Contact> contacts) {
+	private void prepareContactsBirtdays(Cursor cursor) {
 		Long contactId = null;
 		String birthday = null;
+		List<Contact> contacts = mApplication.getContacts();
+		List<Contact> birthdays = mApplication.getBirthdays();
 		while (cursor.moveToNext()) {
 			contactId = cursor.getLong(cursor
 					.getColumnIndex(ContactsContract.Data.CONTACT_ID));
@@ -126,6 +144,7 @@ public class BirthdaysLoaderAsyncTask extends AsyncTask<Void, Long, Boolean> {
 						contact.setBirthday(Utilities.parseCalendarString(
 								mApplication.getDefaultLocale(),
 								mApplication.getDateFormat(), birthday));
+						birthdays.add(contact);
 					}
 					contact.setLoadedBirthday(true);
 					publishProgress(contactId);
