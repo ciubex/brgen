@@ -45,9 +45,23 @@ public class DatePickerDialogFragment extends DialogFragment implements
 	private Contact mContact;
 	private BaseAdapter mAdapter;
 	private Calendar mOldBirthday;
+	private OnDateChangeListener mListener;
+	
+	public static interface OnDateChangeListener {
+		public void onDateChange(boolean modified, Contact contact);
+	}
 
 	public DatePickerDialogFragment() {
 	}
+	
+	/**
+	 * @param listener the listener to set
+	 */
+	public void setListener(OnDateChangeListener listener) {
+		this.mListener = listener;
+	}
+
+
 
 	/**
 	 * Set main application.
@@ -113,6 +127,9 @@ public class DatePickerDialogFragment extends DialogFragment implements
 			mAdapter.notifyDataSetChanged();
 		} else {
 			mContact.setBirthday(mOldBirthday);
+		}
+		if (mListener != null) {
+			mListener.onDateChange(result, mContact);
 		}
 		if (mActivity != null) {
 			mApplication.showMessageInfo(mActivity,

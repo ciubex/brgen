@@ -24,6 +24,7 @@ import java.util.List;
 import ro.ciubex.brgen.adapter.SlideMenuListAdapter;
 import ro.ciubex.brgen.fragment.AboutFragment;
 import ro.ciubex.brgen.fragment.BaseFragment;
+import ro.ciubex.brgen.fragment.BirthdayListFragment;
 import ro.ciubex.brgen.fragment.ContactsListFragment;
 import ro.ciubex.brgen.fragment.LicenseFragment;
 import ro.ciubex.brgen.fragment.SettingsFragment;
@@ -33,6 +34,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -52,13 +54,16 @@ import android.widget.ListView;
  * 
  */
 public class MainActivity extends Activity {
+	private MainApplication mApplication;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
 	public static final int FRG_CNT_LIST = 0;
-	public static final int FRG_SETTINGS = 1;
-	public static final int FRG_ABOUT = 2;
-	public static final int FRG_LICENSE = 3;
+	public static final int FRG_BRTH_LIST = 1;
+	public static final int FRG_SETTINGS = 2;
+	public static final int FRG_ABOUT = 3;
+	public static final int FRG_LICENSE = 4;
+	public static final int FORCE_RELOAD_CONTACTS = 100;
 
 	// nav drawer title
 	private CharSequence mDrawerTitle;
@@ -80,16 +85,16 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		mApplication = (MainApplication) getApplication();
+		Resources res = getResources();
 
 		mTitle = mDrawerTitle = getTitle();
 
 		// load slide menu items
-		mNavMenuTitles = getResources()
-				.getStringArray(R.array.slide_menu_items);
+		mNavMenuTitles = res.getStringArray(R.array.slide_menu_items);
 
 		// nav drawer icons from resources
-		mNavMenuIcons = getResources().obtainTypedArray(
-				R.array.slide_menu_icons);
+		mNavMenuIcons = res.obtainTypedArray(R.array.slide_menu_icons);
 
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
@@ -100,12 +105,15 @@ public class MainActivity extends Activity {
 		// Contact list
 		mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[0], mNavMenuIcons
 				.getResourceId(0, -1)));
-		// Settings
+		// Birthdays list
 		mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[1], mNavMenuIcons
 				.getResourceId(1, -1)));
-		// About
+		// Settings
 		mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[2], mNavMenuIcons
 				.getResourceId(2, -1)));
+		// About
+		mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[3], mNavMenuIcons
+				.getResourceId(3, -1)));
 
 		// Recycle the typed array
 		mNavMenuIcons.recycle();
@@ -157,8 +165,9 @@ public class MainActivity extends Activity {
 	 * Method used to initialize the application fragments.
 	 */
 	private void prepareFragments() {
-		mFragments = new Fragment[4];
+		mFragments = new Fragment[5];
 		mFragments[FRG_CNT_LIST] = new ContactsListFragment();
+		mFragments[FRG_BRTH_LIST] = new BirthdayListFragment();
 		mFragments[FRG_SETTINGS] = new SettingsFragment();
 		mFragments[FRG_ABOUT] = new AboutFragment();
 		mFragments[FRG_LICENSE] = new LicenseFragment();
@@ -208,7 +217,8 @@ public class MainActivity extends Activity {
 		// Handle action bar actions click
 		switch (item.getItemId()) {
 		case R.id.action_update_reminders:
-			((ContactsListFragment) mFragments[FRG_CNT_LIST]).updateAllReminders();
+			((ContactsListFragment) mFragments[FRG_CNT_LIST])
+					.updateAllReminders();
 			return true;
 		case R.id.action_sync:
 			((ContactsListFragment) mFragments[FRG_CNT_LIST]).syncReminders();
@@ -267,6 +277,10 @@ public class MainActivity extends Activity {
 	public void displayView(int position, int contentId) {
 		// update the main content by replacing fragments
 		Fragment fragment = null;
+		if (FRG_BRTH_LIST == position && !mApplication.isBirthdaysLoaded()) {
+			position = mFragmentIdCurrent;
+			mApplication.showMessageInfo(this, R.string.birthdays_not_loaded);
+		}
 		if (position > -1 && position < mFragments.length) {
 			fragment = mFragments[position];
 			mFragmentIdCurrent = position;
@@ -292,6 +306,10 @@ public class MainActivity extends Activity {
 				mDrawerLayout.closeDrawer(mDrawerList);
 			}
 			invalidateOptionsMenu();
+			if (FRG_CNT_LIST == position && FORCE_RELOAD_CONTACTS == contentId) {
+				((ContactsListFragment) mFragments[FRG_CNT_LIST])
+						.reloadContactList();
+			}
 		} else {
 			// error in creating fragment
 			Log.e("MainActivity", "Error in creating fragment");

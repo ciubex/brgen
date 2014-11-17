@@ -34,4 +34,11 @@
         android:text="@string/no_contacts"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/empty_bithday_list_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_birthdays"
+        android:visibility="gone" />
+
 </LinearLayout>

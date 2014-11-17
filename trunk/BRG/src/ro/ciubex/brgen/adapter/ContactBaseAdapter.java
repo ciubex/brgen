@@ -28,7 +28,9 @@ import ro.ciubex.brgen.MainApplication;
 import ro.ciubex.brgen.R;
 import ro.ciubex.brgen.list.ContactListFilter;
 import ro.ciubex.brgen.model.Contact;
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.BaseAdapter;
@@ -42,8 +44,10 @@ import android.widget.TextView;
  * @author Claudiu Ciobotariu
  * 
  */
-public abstract class ContactBaseAdapter extends BaseAdapter {
+public abstract class ContactBaseAdapter extends BaseAdapter implements
+		StickyListHeadersAdapter {
 	protected MainApplication mApplication;
+	protected Resources mResources;
 	protected Context mContext;
 	protected LayoutInflater mInflater;
 	protected List<ContactListItem> mItems;
@@ -59,6 +63,7 @@ public abstract class ContactBaseAdapter extends BaseAdapter {
 			Locale locale) {
 		mContext = (Context) application;
 		mApplication = application;
+		mResources = mContext.getResources();
 		mItemClickListener = itemClickListener;
 		mInflater = (LayoutInflater) mContext
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -66,6 +71,7 @@ public abstract class ContactBaseAdapter extends BaseAdapter {
 		this.mLocale = locale;
 		mIndexes = new HashMap<String, Integer>();
 		mItems = new ArrayList<ContactListItem>();
+		initSections();
 		initItems(contacts);
 	}
 
@@ -83,35 +89,9 @@ public abstract class ContactBaseAdapter extends BaseAdapter {
 	}
 
 	/**
-	 * Initialize the list indexes
+	 * Initialize sections.
 	 */
-	public void initIndexes() {
-		if (!mIndexes.isEmpty()) {
-			mIndexes.clear();
-		}
-		mSections = mContext.getResources().getStringArray(
-				R.array.sections_alphabetically);
-		int size = mSections.length;
-		if (mItems.isEmpty()) {
-			mIndexes.put(mSections[0], 0);
-		} else {
-			int s, i, idx = 0;
-			int count = mItems.size();
-			String key;
-			String sectionLabel;
-			for (s = 0; s < size; s++) {
-				key = mSections[s];
-				for (i = idx; i < count; i++) {
-					sectionLabel = mItems.get(i).getSectionLabel();
-					if (key.equals(sectionLabel)) {
-						idx = i;
-						break;
-					}
-				}
-				mIndexes.put(key, idx);
-			}
-		}
-	}
+	abstract protected void initSections();
 
 	/**
 	 * Add a contact item to the adapter item list
@@ -120,6 +100,11 @@ public abstract class ContactBaseAdapter extends BaseAdapter {
 	 *            The contact model to be added to the adapter item list
 	 */
 	abstract public void add(Contact item);
+
+	/**
+	 * Initialize the list indexes
+	 */
+	abstract public void initIndexes();
 
 	/**
 	 * Get all contacts loaded on the adapter

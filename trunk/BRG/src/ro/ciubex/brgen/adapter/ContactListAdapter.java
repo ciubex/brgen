@@ -1,5 +1,20 @@
 /**
+ * This file is part of BRG application.
  * 
+ * Copyright (C) 2014 Claudiu Ciobotariu
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package ro.ciubex.brgen.adapter;
 
@@ -14,22 +29,70 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
+ * This is the contact list adapter used on the contact list view.
+ * 
  * @author Claudiu Ciobotariu
  * 
  */
-public class StickyListAdapter extends ContactBaseAdapter implements
+public class ContactListAdapter extends ContactBaseAdapter implements
 		StickyListHeadersAdapter {
 
-	public StickyListAdapter(MainApplication application,
+	public ContactListAdapter(MainApplication application,
 			OnListItemClickListener itemClickListener, List<Contact> contacts,
 			Locale locale) {
 		super(application, itemClickListener, contacts, locale);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see ro.ciubex.brgen.adapter.ContactBaseAdapter#initSections()
+	 */
+	@Override
+	protected void initSections() {
+		mSections = mResources.getStringArray(R.array.sections_alphabetically);
+	}
+
 	@Override
 	public void add(Contact item) {
 		ContactListItem itm = new ContactListItem(item);
+		char ch = item.getContactName().charAt(0);
+		if (Character.isDigit(ch)) {
+			itm.setSectionLabel("-");
+		} else {
+			itm.setSectionLabel("" + Character.toUpperCase(ch));
+		}
 		mItems.add(itm);
+	}
+
+	/**
+	 * Initialize the list indexes
+	 */
+	@Override
+	public void initIndexes() {
+		if (!mIndexes.isEmpty()) {
+			mIndexes.clear();
+		}
+		int size = mSections.length;
+		if (mItems.isEmpty()) {
+			mIndexes.put(mSections[0], 0);
+		} else {
+			int s, i, idx = 0;
+			int count = mItems.size();
+			String key;
+			String sectionLabel;
+			for (s = 0; s < size; s++) {
+				key = mSections[s];
+				for (i = idx; i < count; i++) {
+					sectionLabel = mItems.get(i).getSectionLabel();
+					if (key.equals(sectionLabel)) {
+						idx = i;
+						break;
+					}
+				}
+				mIndexes.put(key, idx);
+			}
+		}
 	}
 
 	/*

@@ -18,6 +18,7 @@
  */
 package ro.ciubex.brgen.model;
 
+import java.util.Calendar;
 import java.util.Comparator;
 
 /**
@@ -30,10 +31,23 @@ public class BirthdayComparator implements Comparator<Contact> {
 
 	@Override
 	public int compare(Contact o1, Contact o2) {
-		if (o1.getBirthday() == null || o2.getBirthday() == null) {
-			return ContactsComparator.nameCompare(o1, o2);
+		Calendar c1 = o1.getBirthday();
+		Calendar c2 = o2.getBirthday();
+		if (c1 != null && c2 != null) {
+			int m1 = c1.get(Calendar.MONTH);
+			int m2 = c2.get(Calendar.MONTH);
+			int d1 = c1.get(Calendar.DAY_OF_MONTH);
+			int d2 = c2.get(Calendar.DAY_OF_MONTH);
+			if (m1 == m2) {
+				if (d1 == d2) {
+					return ContactsComparator.nameCompare(o1, o2);
+				}
+				return d1 - d2;
+			} else {
+				return m1 - m2;
+			}
 		}
-		return 0;
+		return ContactsComparator.nameCompare(o1, o2);
 	}
 
 }

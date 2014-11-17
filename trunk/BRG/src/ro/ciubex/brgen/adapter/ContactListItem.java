@@ -27,25 +27,21 @@ import ro.ciubex.brgen.model.Contact;
  * 
  */
 public class ContactListItem {
-	private int mItemType;
 	private String mSectionLabel = "";
 	private Contact mContactModel;
 
-	public ContactListItem(String sectionLabel) {
-		this.mSectionLabel = sectionLabel;
-		mItemType = ContactItemType.SEPARATOR;
-	}
-	
 	public ContactListItem(Contact contactModel) {
 		this.mContactModel = contactModel;
-		mItemType = ContactItemType.ITEM;
-		char ch = contactModel.getContactName().charAt(0);
-		mSectionLabel = (Character.isDigit(ch) ? "-" : ""
-				+ Character.toUpperCase(ch));
 	}
 
-	public int getItemType() {
-		return mItemType;
+	/**
+	 * Set the section label.
+	 * 
+	 * @param sectionLabel
+	 *            the mSectionLabel to set
+	 */
+	public void setSectionLabel(String sectionLabel) {
+		this.mSectionLabel = sectionLabel;
 	}
 
 	public String getSectionLabel() {
