@@ -37,7 +37,9 @@ import android.view.ViewGroup;
 public class BirthdayListAdapter extends ContactBaseAdapter {
 	private Calendar mNow;
 	private int mNowMonth;
+	private int mNextMonth;
 	private int mNowDay;
+	private int mNextDay;
 	private int mThisYear;
 	private int mNextYear;
 	private String mLabelToday;
@@ -79,6 +81,11 @@ public class BirthdayListAdapter extends ContactBaseAdapter {
 		mNowDay = mNow.get(Calendar.DAY_OF_MONTH);
 		mThisYear = mNow.get(Calendar.YEAR);
 		mNextYear = mThisYear + 1;
+		mNow.add(Calendar.DAY_OF_YEAR, 1);
+		mNextDay = mNow.get(Calendar.DAY_OF_MONTH);
+		mNow.set(Calendar.MONTH, mNowMonth);
+		mNow.add(Calendar.MONTH, 1);
+		mNextMonth = mNow.get(Calendar.MONTH);
 		super.initItems(contacts);
 	}
 
@@ -96,18 +103,15 @@ public class BirthdayListAdapter extends ContactBaseAdapter {
 			Calendar c = item.getBirthday();
 			String label;
 			int calM = c.get(Calendar.MONTH);
-			if (mNowMonth == calM) {
-				int calD = c.get(Calendar.DAY_OF_MONTH);
-				if (calD < mNowDay) {
-					label = getMonthLabel(calM);
-				} else if (calD == mNowDay) {
-					label = mLabelToday;
-				} else if ((calD - 1) == mNowDay) {
-					label = mLabelTomorrow;
-				} else {
-					label = mLabelThisMonth;
-				}
-			} else if (mNowMonth == (calM - 1)) {
+			int calD = c.get(Calendar.DAY_OF_MONTH);
+			if (mNowDay == calD && mNowMonth == calM) {
+				label = mLabelToday;
+			} else if (mNextDay == calD
+					&& (mNowMonth == calM || mNextMonth == calM)) {
+				label = mLabelTomorrow;
+			} else if (mNowMonth == calM) {
+				label = mLabelThisMonth;
+			} else if (mNextMonth == calM) {
 				label = mLabelNextMonth;
 			} else {
 				label = getMonthLabel(calM);
