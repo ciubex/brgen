@@ -104,8 +104,8 @@ public class BirthdaySortAsyncTask extends AsyncTask<Void, Void, Boolean> {
 				int pivot = 0;
 				int idx;
 				int m1 = now.get(Calendar.MONTH);
-				int m2 = 0;
 				int d1 = now.get(Calendar.DAY_OF_MONTH);
+				int m2 = 0;
 				int d2;
 				Calendar c;
 				Collections.sort(birthdays, birthdayComparator);
@@ -117,10 +117,12 @@ public class BirthdaySortAsyncTask extends AsyncTask<Void, Void, Boolean> {
 						if (d2 >= d1) {
 							break;
 						}
+					} else if (m2 > m1) {
+						break;
 					}
 					pivot++;
 				}
-				if (pivot > 0) {
+				if (pivot > 0 && pivot < birthdays.size() - 1) {
 					idx = 0;
 					Contact contact;
 					while (idx < pivot) {
