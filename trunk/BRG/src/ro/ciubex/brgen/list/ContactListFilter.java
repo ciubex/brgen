@@ -56,7 +56,7 @@ public class ContactListFilter extends Filter {
 		results.values = null;
 		results.count = -1;
 		List<Contact> contacts = adapter.getContacts();
-		int originalSize = contacts.size();
+		int originalSize = contacts != null ? contacts.size() : 0;
 		if (constraint.length() > 0) {
 			String filter = constraint.toString().trim();
 			if (filter.length() > 0) {
@@ -94,12 +94,16 @@ public class ContactListFilter extends Filter {
 		if (results.count > -1) {
 			@SuppressWarnings("unchecked")
 			List<Contact> filterList = (List<Contact>) results.values;
-			adapter.clear();
-			for (Contact contact : filterList) {
-				adapter.add(contact);
+				if (filterList != null) {
+				adapter.clear();
+				for (Contact contact : filterList) {
+					adapter.add(contact);
+				}
+				adapter.initIndexes();
+				adapter.notifyDataSetChanged();
+			} else {
+				adapter.notifyDataSetInvalidated();
 			}
-			adapter.initIndexes();
-			adapter.notifyDataSetChanged();
 		} else {
 			adapter.notifyDataSetInvalidated();
 		}
