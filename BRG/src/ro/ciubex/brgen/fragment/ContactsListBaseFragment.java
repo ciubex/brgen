@@ -95,6 +95,16 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 			}
 		});
 	}
+	
+	/**
+	 * Check if is the case to filter the list.
+	 */
+	protected void checkFilter() {
+		String filterText = mFilterBox.getText().toString();
+		if (filterText != null && filterText.length() > 0) {
+			applyFilter(filterText);
+		}
+	}
 
 	/**
 	 * This method is invoked when the filter is edited

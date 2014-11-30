@@ -109,7 +109,7 @@ public class BirthdayListAdapter extends ContactBaseAdapter {
 			} else if (mNextDay == calD
 					&& (mNowMonth == calM || mNextMonth == calM)) {
 				label = mLabelTomorrow;
-			} else if (mNowMonth == calM) {
+			} else if (mNowMonth == calM && mNowDay < calD) {
 				label = mLabelThisMonth;
 			} else if (mNextMonth == calM) {
 				label = mLabelNextMonth;

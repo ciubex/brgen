@@ -70,6 +70,7 @@ public class BirthdayListFragment extends ContactsListBaseFragment implements
 	public void sortFinished() {
 		initBirthdaysList();
 		mApplication.hideProgressDialog();
+		checkFilter();
 	}
 
 	/**
