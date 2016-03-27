@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/gui_category" >
+    <PreferenceCategory android:title="@string/gui_category">
+        <ListPreference
+            android:defaultValue="light"
+            android:entries="@array/app_theme_labels"
+            android:entryValues="@array/app_theme_values"
+            android:key="appTheme"
+            android:summary="@string/app_theme_desc"
+            android:title="@string/app_theme_title" />
+
         <CheckBoxPreference
             android:key="enableFastScroll"
             android:summary="@string/enable_fast_scroll_desc"
@@ -13,7 +21,14 @@
             android:summary="@string/displayDateFormat"
             android:title="@string/str_displayDateFormat" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/general_settings" >
+    <PreferenceCategory
+        android:key="otherSettings"
+        android:title="@string/general_settings">
+        <Preference
+            android:key="requestPermissions"
+            android:persistent="false"
+            android:summary="@string/request_permissions_desc"
+            android:title="@string/request_permissions_title" />
         <EditTextPreference
             android:defaultValue="@string/date_format"
             android:key="dateFormat"
@@ -30,15 +45,15 @@
 
         <EditTextPreference
             android:defaultValue="@string/sms_template_model"
-            android:key="smsTemplate"
             android:inputType="textMultiLine"
+            android:key="smsTemplate"
             android:lines="3"
-            android:minLines="3"
             android:maxLines="10"
+            android:minLines="3"
             android:summary="@string/sms_template_desc"
             android:title="@string/sms_template_title" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/reminder_settings" >
+    <PreferenceCategory android:title="@string/reminder_settings">
         <EditTextPreference
             android:defaultValue="@string/reminderTitleFormat"
             android:key="reminderTitleFormat"
@@ -71,7 +86,7 @@
             android:summary="@string/str_isAllDaySummary"
             android:title="@string/str_isAllDay" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/time_title" >
+    <PreferenceCategory android:title="@string/time_title">
         <ro.ciubex.brgen.form.TimePreference
             android:defaultValue="@string/reminderStartTime"
             android:dependency="isAllDay"
@@ -89,11 +104,11 @@
             android:summary="@string/str_when_end"
             android:title="@string/str_reminderEndTime" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/backup_restore_settings" >
+    <PreferenceCategory android:title="@string/backup_restore_settings">
         <PreferenceScreen
             android:summary="@string/backup_restore_settings_desc"
-            android:title="@string/backup_restore_settings" >
-            <PreferenceCategory android:title="@string/backup_settings" >
+            android:title="@string/backup_restore_settings">
+            <PreferenceCategory android:title="@string/backup_settings">
                 <ro.ciubex.brgen.form.CustomEditTextPreference
                     android:defaultValue="@string/default_backup_file"
                     android:key="preferencesBackup"

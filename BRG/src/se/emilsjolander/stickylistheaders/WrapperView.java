@@ -1,7 +1,7 @@
 /**
  * This file is part of BRG application.
  * 
- * Copyright 2014 Emil Sjölander
+ * Copyright 2014 Emil SjÃ¶lander
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import android.view.ViewParent;
  * 
  * the view that wrapps a divider header and a normal list item. The listview sees this as 1 item
  * 
- * @author Emil Sjölander
+ * @author Emil SjÃ¶lander
  */
 public class WrapperView extends ViewGroup {
 

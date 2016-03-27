@@ -114,7 +114,9 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 	 */
 	private void applyFilter(CharSequence charSequence) {
 		mApplication.showProgressDialog(mActivity, R.string.filtering);
-		mAdapter.getFilter().filter(charSequence);
+		if (mAdapter != null) {
+			mAdapter.getFilter().filter(charSequence);
+		}
 		mApplication.hideProgressDialog();
 	}
 
@@ -531,7 +533,7 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 	 *            The ID of the task, call or send SMS.
 	 */
 	private void onSelectContact(int contactPosition, int taskId) {
-		Contact contact = (Contact) mAdapter.getItem(contactPosition);
+		Contact contact = mAdapter.getItem(contactPosition);
 		if (contact != null) {
 			if (contact.havePhoneNumbers()) {
 				onSelectContact(contact, taskId);

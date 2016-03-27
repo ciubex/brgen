@@ -39,7 +39,7 @@ public class ContactsListFragment extends ContactsListBaseFragment implements
 		return R.layout.fragment_contacts_list;
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see ro.ciubex.brgen.fragment.BaseFragment#initFragment()
@@ -72,7 +72,9 @@ public class ContactsListFragment extends ContactsListBaseFragment implements
 	 * Prepare thread used to load the contacts to the list view.
 	 */
 	private void loadContactListView() {
-		new LoadContactsAsyncTask(this, mApplication.getContacts()).execute();
+		if (mApplication.haveFunctionalPermissions()) {
+			new LoadContactsAsyncTask(this, mApplication.getContacts()).execute();
+		}
 	}
 
 	/**
@@ -104,7 +106,7 @@ public class ContactsListFragment extends ContactsListBaseFragment implements
 	 * Method used to create the list view.
 	 */
 	private void preparePhoneContactsList() {
-		mAdapter = new ContactListAdapter(mApplication, this,
+		mAdapter = new ContactListAdapter(mApplication, getActivity(), this,
 				mApplication.getContacts(), mApplication.getDefaultLocale());
 		mListView.setAdapter(mAdapter);
 		mListView.setFastScrollEnabled(mApplication.getApplicationPreferences()

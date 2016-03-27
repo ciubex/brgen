@@ -24,6 +24,8 @@ import java.io.InputStream;
 import ro.ciubex.brgen.MainActivity;
 import ro.ciubex.brgen.R;
 import android.content.res.AssetManager;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,7 +44,7 @@ public class LicenseFragment extends BaseFragment {
 	private TextView licenseTxt;
 	private Button okButton;
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see ro.ciubex.brgen.fragment.BaseFragment#getFragmentResourceId()
@@ -52,7 +54,7 @@ public class LicenseFragment extends BaseFragment {
 		return R.layout.fragment_license;
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see ro.ciubex.brgen.fragment.BaseFragment#initFragment()
@@ -78,16 +80,18 @@ public class LicenseFragment extends BaseFragment {
 		mActivity.displayView(MainActivity.FRG_ABOUT, -1);
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * (non-Javadoc)
 	 * @see android.app.Fragment#onResume()
 	 */
 	@Override
 	public void onResume() {
-		String fileName = "LICENSE.TXT";
+		String fileName = "gpl-3.0-standalone.html";
 		if (mContentId == LICENCE_2_0) {
-			fileName = "LICENSE-2.0.TXT";
+			fileName = "LICENSE-2.0.html";
 		}
-		licenseTxt.setText(getStreamText(fileName));
+		licenseTxt.setMovementMethod(LinkMovementMethod.getInstance());
+		licenseTxt.setText(Html.fromHtml(getStreamText(fileName)));
 		super.onResume();
 	}
 

@@ -25,6 +25,8 @@ import java.util.Locale;
 import ro.ciubex.brgen.MainApplication;
 import ro.ciubex.brgen.R;
 import ro.ciubex.brgen.model.Contact;
+
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -53,10 +55,10 @@ public class BirthdayListAdapter extends ContactBaseAdapter {
 	 * @param contacts
 	 * @param locale
 	 */
-	public BirthdayListAdapter(MainApplication application,
+	public BirthdayListAdapter(MainApplication application, Context context,
 			OnListItemClickListener itemClickListener, List<Contact> contacts,
 			Locale locale) {
-		super(application, itemClickListener, contacts, locale);
+		super(application, context, itemClickListener, contacts, locale);
 	}
 
 	@Override
@@ -89,7 +91,7 @@ public class BirthdayListAdapter extends ContactBaseAdapter {
 		super.initItems(contacts);
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see
@@ -135,7 +137,7 @@ public class BirthdayListAdapter extends ContactBaseAdapter {
 						: mNextYear);
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see ro.ciubex.brgen.adapter.ContactBaseAdapter#initIndexes()
@@ -160,7 +162,7 @@ public class BirthdayListAdapter extends ContactBaseAdapter {
 		}
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see android.widget.Adapter#getView(int, android.view.View,
@@ -181,7 +183,7 @@ public class BirthdayListAdapter extends ContactBaseAdapter {
 		return view;
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see
@@ -203,7 +205,7 @@ public class BirthdayListAdapter extends ContactBaseAdapter {
 		return view;
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see

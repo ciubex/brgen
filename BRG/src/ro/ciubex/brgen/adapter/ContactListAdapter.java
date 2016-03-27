@@ -25,6 +25,8 @@ import ro.ciubex.brgen.MainApplication;
 import ro.ciubex.brgen.R;
 import ro.ciubex.brgen.model.Contact;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -37,13 +39,13 @@ import android.view.ViewGroup;
 public class ContactListAdapter extends ContactBaseAdapter implements
 		StickyListHeadersAdapter {
 
-	public ContactListAdapter(MainApplication application,
+	public ContactListAdapter(MainApplication application, Context context,
 			OnListItemClickListener itemClickListener, List<Contact> contacts,
 			Locale locale) {
-		super(application, itemClickListener, contacts, locale);
+		super(application, context, itemClickListener, contacts, locale);
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see ro.ciubex.brgen.adapter.ContactBaseAdapter#initSections()
@@ -95,7 +97,7 @@ public class ContactListAdapter extends ContactBaseAdapter implements
 		}
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see android.widget.Adapter#getView(int, android.view.View,
@@ -116,7 +118,7 @@ public class ContactListAdapter extends ContactBaseAdapter implements
 		return view;
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see
@@ -138,7 +140,7 @@ public class ContactListAdapter extends ContactBaseAdapter implements
 		return view;
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see

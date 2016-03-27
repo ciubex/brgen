@@ -58,11 +58,11 @@ public abstract class ContactBaseAdapter extends BaseAdapter implements
 	protected Locale mLocale;
 	protected OnListItemClickListener mItemClickListener;
 
-	public ContactBaseAdapter(MainApplication application,
+	public ContactBaseAdapter(MainApplication application, Context context,
 			OnListItemClickListener itemClickListener, List<Contact> contacts,
 			Locale locale) {
-		mContext = (Context) application;
 		mApplication = application;
+		mContext = context;
 		mResources = mContext.getResources();
 		mItemClickListener = itemClickListener;
 		mInflater = (LayoutInflater) mContext

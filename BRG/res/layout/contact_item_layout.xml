@@ -22,7 +22,6 @@
 
         <TextView
             android:id="@+id/firstItemText"
-            style="@style/contactName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/loading_wait"
@@ -36,7 +35,6 @@
 
             <TextView
                 android:id="@+id/secondItemText"
-                style="@style/contactDetails"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -46,7 +44,6 @@
 
             <TextView
                 android:id="@+id/thirdItemText"
-                style="@style/contactDetails"
                 android:layout_width="0dip"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

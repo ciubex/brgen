@@ -17,7 +17,7 @@ import android.content.Intent;
 public class BirthdayListFragment extends ContactsListBaseFragment implements
 		BirthdaySortAsyncTask.SortListener {
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see ro.ciubex.brgen.fragment.BaseFragment#getFragmentResourceId()
@@ -27,7 +27,7 @@ public class BirthdayListFragment extends ContactsListBaseFragment implements
 		return R.layout.fragment_contacts_list;
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see ro.ciubex.brgen.fragment.BaseFragment#initFragment()
@@ -77,7 +77,7 @@ public class BirthdayListFragment extends ContactsListBaseFragment implements
 	 * Initialize the birthday list view.
 	 */
 	private void initBirthdaysList() {
-		mAdapter = new BirthdayListAdapter(mApplication, this,
+		mAdapter = new BirthdayListAdapter(mApplication, getActivity(), this,
 				mApplication.getBirthdays(), mApplication.getDefaultLocale());
 		mListView.setAdapter(mAdapter);
 		mListView.setFastScrollEnabled(mApplication.getApplicationPreferences()

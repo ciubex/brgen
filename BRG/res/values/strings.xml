@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Birthday Reminder Generator</string>
+    <string name="app_name" translatable="false">Birthday Reminder Generator</string>
     <string name="date_format">yyyy-MM-dd</string>
 
     <!-- Contacts strings -->
@@ -15,8 +15,8 @@
     <string name="filtering">Filtering&#8230;</string>
     <string name="select_all">Select all</string>
     <string name="unselect_all">Unselect all</string>
-    <string name="contact_image">[ ]</string>
-    <string name="icon_checkbox">[ ]</string>
+    <string name="contact_image" translatable="false">[ ]</string>
+    <string name="icon_checkbox" translatable="false">[ ]</string>
     <string name="no_contacts">You don\'t have contacts</string>
     <string name="contacts_loaded">Were loaded %d contacts</string>
     <string name="loading_birthdays">Loading birthdays&#8230;</string>
@@ -91,7 +91,7 @@
     </string-array>
 
     <!-- Slide Menu Icons -->
-    <array name="slide_menu_icons">
+    <array name="slide_menu_icons" translatable="false">
         <item>@drawable/contacts</item>
         <item>@drawable/contacts</item>
         <item>@drawable/settings</item>
@@ -195,7 +195,7 @@
         <item>Email</item>
         <item>SMS</item>
     </string-array>
-    <string-array name="choose_reminder_type_values">
+    <string-array name="choose_reminder_type_values" translatable="false">
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -222,7 +222,7 @@
         <item>2 days</item>
         <item>1 week</item>
     </string-array>
-    <string-array name="choose_reminder_before_values">
+    <string-array name="choose_reminder_before_values" translatable="false">
         <item>-1</item>
         <item>0</item>
         <item>5</item>
@@ -241,9 +241,31 @@
         <item>10080</item>
     </string-array>
 
+    <!-- UI settings -->
+
     <string name="gui_category">User interface</string>
     <string name="enable_fast_scroll">Enable fast scroll</string>
     <string name="enable_fast_scroll_desc">Enable contact list fast scroll (restart app required)</string>
+
+    <string name="app_theme_title">Application theme:</string>
+    <string name="app_theme_title_param">Application theme: %s</string>
+    <string name="app_theme_desc">Set the application theme: light or dark.</string>
+    <string-array name="app_theme_labels">
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="app_theme_values" translatable="false">
+        <item>light</item>
+        <item>dark</item>
+    </string-array>
+    <string name="must_restart_application">To apply changes the application will try to restart itself, if the changes are not applied please restart manually the application!</string>
+
+
+    <!-- Permission sections -->
+    <string name="request_permissions_title">Request required application permission.</string>
+    <string name="request_permissions_desc">Touch this option to request all required application permissions to access CONTACTS, CALENDAR and EXTERNAL STORAGE.</string>
+    <string name="request_permissions_confirmation">Do you want to request for required application permissions?</string>
+    <string name="request_permissions_ok">All required permissions are granted!</string>
 
     <!-- Backup and restore -->
     <string name="backup_restore_settings">Backup, restore or reset settings</string>
@@ -303,6 +325,6 @@ Thank you for using this application!<br/>]]>
     <string name="donate">Donate</string>
     <string name="donate_title">Donation confirmation</string>
     <string name="donate_message">If you appreciate this application, please do a donation buying Birthday Reminder Gen. PRO!\nPressing YES button, you will be sent to Birthday Reminder Gen. PRO from Google Play Store.\nThank you for using this application!</string>
-    <string name="donate_url"><Data><![CDATA[https://play.google.com/store/apps/details?id=ro.ciubex.brgenpro]]></Data></string>
+    <string name="donate_url" translatable="false"><Data><![CDATA[https://play.google.com/store/apps/details?id=ro.ciubex.brgenpro]]></Data></string>
 
 </resources>

@@ -29,15 +29,20 @@ import ro.ciubex.brgen.model.GoogleCalendar;
 import ro.ciubex.brgen.tasks.DefaultAsyncTaskResult;
 import ro.ciubex.brgen.tasks.PreferencesFileUtilAsynkTask;
 import ro.ciubex.brgen.util.CalendarUtils;
+import ro.ciubex.brgen.util.Utilities;
+
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
@@ -52,17 +57,15 @@ public class SettingsFragment extends PreferenceFragment implements
 		PreferencesFileUtilAsynkTask.Responder {
 	private MainApplication mApplication;
 	private MainActivity mActivity;
+	private Preference mAppTheme;
 	private ListPreference mCalendarList;
+	private PreferenceCategory mOtherSettings;
 	private CustomEditTextPreference preferencesBackup;
 	private CustomEditTextPreference preferencesRestore;
 	private static final int PREF_BACKUP = 1;
 	private static final int PREF_RESTORE = 2;
 
-	public void setMainActivity(MainActivity mainActivity) {
-		this.mActivity = mainActivity;
-	}
-
-	/*
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see android.preference.PreferenceFragment#onCreate(android.os.Bundle)
@@ -73,9 +76,13 @@ public class SettingsFragment extends PreferenceFragment implements
 		addPreferencesFromResource(R.xml.settings_preferences);
 		mActivity = (MainActivity) getActivity();
 		mApplication = (MainApplication) mActivity.getApplication();
+		mAppTheme = findPreference(MainApplication.KEY_APP_THEME);
 		mCalendarList = (ListPreference) findPreference("calendarList");
+		mOtherSettings = (PreferenceCategory) findPreference("otherSettings");
 		prepareAllCustomEditTextPreference();
 		preparePreferencesReset();
+		prepareRequestPermissions();
+		initPreferencesByPermissions();
 		populateAvailableCalendars();
 	}
 
@@ -99,7 +106,7 @@ public class SettingsFragment extends PreferenceFragment implements
 	 * Prepare reset preference handler
 	 */
 	private void preparePreferencesReset() {
-		Preference preferencesReset = (Preference) findPreference("preferencesReset");
+		Preference preferencesReset = findPreference("preferencesReset");
 		preferencesReset
 				.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 
@@ -110,15 +117,39 @@ public class SettingsFragment extends PreferenceFragment implements
 				});
 	}
 
+	private void prepareRequestPermissions() {
+		Preference requestPermissions = findPreference("requestPermissions");
+		requestPermissions.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				onRequestPermissions();
+				return true;
+			}
+		});
+	}
+
+	/**
+	 * Remove the permission request preference if should not be asked for permissions.
+	 */
+	private void initPreferencesByPermissions() {
+		if (!mApplication.shouldAskPermissions()) {
+			Preference requestPermissions = findPreference("requestPermissions");
+			if (requestPermissions != null) {
+				mOtherSettings.removePreference(requestPermissions);
+			}
+		}
+	}
+
 	/**
 	 * Prepare all informations when the activity is resuming
 	 */
 	@Override
 	public void onResume() {
 		super.onResume();
-		prepareSummaries();
 		getPreferenceScreen().getSharedPreferences()
 				.registerOnSharedPreferenceChangeListener(this);
+		prepareSummaries();
 	}
 
 	/**
@@ -147,9 +178,9 @@ public class SettingsFragment extends PreferenceFragment implements
 	 */
 	@Override
 	public void onPause() {
-		super.onPause();
 		getPreferenceScreen().getSharedPreferences()
 				.unregisterOnSharedPreferenceChangeListener(this);
+		super.onPause();
 	}
 
 	/**
@@ -171,6 +202,10 @@ public class SettingsFragment extends PreferenceFragment implements
 		editText.setSummary(sp.getString("reminderDescriptionFormat",
 				String.valueOf(editText.getSummary())));
 
+		String label = MainApplication.getAppContext().getString(R.string.app_theme_title_param,
+				getSelectedThemeLabel());
+		mAppTheme.setTitle(label);
+
 		String value = (String) mCalendarList.getValue();
 		if (!"none".equals(value)) {
 			try {
@@ -190,6 +225,21 @@ public class SettingsFragment extends PreferenceFragment implements
 	}
 
 	/**
+	 * Get the application theme label.
+	 *
+	 * @return The application theme label.
+	 */
+	private String getSelectedThemeLabel() {
+		String[] labels = MainApplication.getAppContext().getResources().
+				getStringArray(R.array.app_theme_labels);
+		int themeId = mApplication.getApplicationTheme();
+		if (R.style.AppThemeDark == themeId) {
+			return labels[1];
+		}
+		return labels[0];
+	}
+
+	/**
 	 * This method is invoked when a preference is changed
 	 * 
 	 * @param sp
@@ -201,13 +251,43 @@ public class SettingsFragment extends PreferenceFragment implements
 	public void onSharedPreferenceChanged(SharedPreferences sp, String key) {
 		// Update summary value
 		Preference obj = findPreference(key);
-		if (obj instanceof EditTextPreference) {
+		if (MainApplication.KEY_APP_THEME.equals(key)) {
+			showRestartActivityMessage();
+			prepareSummaries();
+		} else if (obj instanceof EditTextPreference) {
 			EditTextPreference pref = (EditTextPreference) obj;
 			pref.setSummary(sp.getString(key, pref.getText()));
 		} else if (obj instanceof ListPreference) {
 			ListPreference pref = (ListPreference) obj;
 			pref.setSummary((String) pref.getEntry());
 		}
+	}
+
+	/**
+	 * Show to the user an alert message.
+	 */
+	private void showRestartActivityMessage() {
+		new AlertDialog.Builder(mActivity)
+				.setTitle(R.string.app_name)
+				.setMessage(R.string.must_restart_application)
+				.setIcon(android.R.drawable.ic_dialog_info)
+				.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface dialog,
+										int whichButton) {
+						restartApplication();
+					}
+				}).show();
+	}
+
+	/**
+	 * Mark the application to be restarted.
+	 */
+	private void restartApplication() {
+		Intent intent = mActivity.getIntent();
+		mActivity.finish();
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(intent);
 	}
 
 	/**
@@ -396,9 +476,49 @@ public class SettingsFragment extends PreferenceFragment implements
 				.setPositiveButton(R.string.ok,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
-									int which) {
+												int which) {
 								// ignored
 							}
 						}).show();
+	}
+
+	/**
+	 * Method invoked when was pressed the request permission preference.
+	 */
+	private void onRequestPermissions() {
+		new AlertDialog.Builder(mActivity)
+				.setTitle(R.string.app_name)
+				.setMessage(R.string.request_permissions_confirmation)
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.setPositiveButton(R.string.yes,
+						new DialogInterface.OnClickListener() {
+
+							public void onClick(DialogInterface dialog,
+												int whichButton) {
+								doRequestPermissions();
+							}
+						}).setNegativeButton(R.string.no, null).show();
+	}
+
+	/**
+	 * Check if is necessary to request permissions.
+	 */
+	private void doRequestPermissions() {
+		String[] permissions = mApplication.getNotGrantedPermissions();
+		if (Utilities.isEmpty(permissions)) {
+			new AlertDialog.Builder(mActivity)
+					.setIcon(android.R.drawable.ic_dialog_info)
+					.setTitle(R.string.app_name)
+					.setMessage(R.string.request_permissions_ok)
+					.setPositiveButton(R.string.ok,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+													int which) {
+									// ignored
+								}
+							}).show();
+		} else {
+			mActivity.requestForPermissions(permissions);
+		}
 	}
 }

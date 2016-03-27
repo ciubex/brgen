@@ -1,7 +1,7 @@
 /**
  * This file is part of BRG application.
  * 
- * Copyright 2014 Emil Sjölander
+ * Copyright 2014 Emil SjÃ¶lander
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ import se.emilsjolander.stickylistheaders.WrapperViewList.LifeCycleListener;
  *   1. It acts like as ListView.
  *   2. It used to be a ListView subclass and refactoring the name would cause compatibility errors.
  *
- * @author Emil Sjölander
+ * @author Emil SjÃ¶lander
  */
 public class StickyListHeadersListView extends FrameLayout {
 

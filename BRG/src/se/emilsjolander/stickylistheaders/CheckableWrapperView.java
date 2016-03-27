@@ -1,7 +1,7 @@
 /**
  * This file is part of BRG application.
  * 
- * Copyright 2014 Emil Sjölander
+ * Copyright 2014 Emil SjÃ¶lander
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import android.widget.Checkable;
 /**
  * A WrapperView that implements the checkable interface
  * 
- * @author Emil Sjölander
+ * @author Emil SjÃ¶lander
  */
 class CheckableWrapperView extends WrapperView implements Checkable {
 
