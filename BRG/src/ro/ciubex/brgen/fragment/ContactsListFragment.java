@@ -72,7 +72,7 @@ public class ContactsListFragment extends ContactsListBaseFragment implements
 	 * Prepare thread used to load the contacts to the list view.
 	 */
 	private void loadContactListView() {
-		if (mApplication.haveFunctionalPermissions()) {
+		if (mApplication.haveContactsPermissions()) {
 			new LoadContactsAsyncTask(this, mApplication.getContacts()).execute();
 		}
 	}
@@ -82,7 +82,7 @@ public class ContactsListFragment extends ContactsListBaseFragment implements
 	 */
 	@Override
 	public void startLoadContacts() {
-		mApplication.showProgressDialog(mActivity, R.string.please_wait);
+		mApplication.showProgressDialog(getActivity(), R.string.please_wait);
 	}
 
 	/**
@@ -94,11 +94,11 @@ public class ContactsListFragment extends ContactsListBaseFragment implements
 		mApplication.setContactsLoaded(true);
 		mApplication.hideProgressDialog();
 		if (Constants.OK == result.resultId) {
-			mApplication.showMessageInfo(mActivity, result.resultMessage);
+			mApplication.showMessageInfo(getActivity(), result.resultMessage);
 			new BirthdaysLoaderAsyncTask(mApplication, mAdapter).execute();
 			new ContactImageLoaderAsyncTask(mApplication, mAdapter).execute();
 		} else {
-			showMessageError(R.string.error_occurred, result.resultMessage);
+			mApplication.showMessageInfo(getActivity(), result.resultMessage);
 		}
 	}
 
@@ -137,7 +137,7 @@ public class ContactsListFragment extends ContactsListBaseFragment implements
 	 */
 	public void syncReminders() {
 		if (mApplication.getContacts().isEmpty()) {
-			showMessageError(R.string.attention, R.string.no_contacts);
+			mApplication.showMessageInfo(getActivity() , R.string.no_contacts);
 		} else if (mApplication.getApplicationPreferences()
 				.haveCalendarSelected()) {
 			showConfirmationDialog(
@@ -154,7 +154,7 @@ public class ContactsListFragment extends ContactsListBaseFragment implements
 	 */
 	@Override
 	public void startSyncReminders() {
-		mApplication.showProgressDialog(mActivity, R.string.sync_in_progress);
+		mApplication.showProgressDialog(getActivity(), R.string.sync_in_progress);
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class ContactsListFragment extends ContactsListBaseFragment implements
 		}
 		mApplication.hideProgressDialog();
 		if (result.resultMessage != null) {
-			mApplication.showMessageInfo(mActivity, result.resultMessage);
+			mApplication.showMessageInfo(getActivity(), result.resultMessage);
 		}
 	}
 

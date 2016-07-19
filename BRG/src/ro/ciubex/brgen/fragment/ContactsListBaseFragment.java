@@ -113,7 +113,7 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 	 *            The char sequence from the filter
 	 */
 	private void applyFilter(CharSequence charSequence) {
-		mApplication.showProgressDialog(mActivity, R.string.filtering);
+		mApplication.showProgressDialog(getActivity(), R.string.filtering);
 		if (mAdapter != null) {
 			mAdapter.getFilter().filter(charSequence);
 		}
@@ -228,7 +228,7 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 	 */
 	protected void showItemDialogMenu(String title, final int itemsId,
 			final int contactPosition) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(title);
 		builder.setItems(itemsId, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which) {
@@ -505,7 +505,7 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 	 */
 	@Override
 	public void startUpdateReminders() {
-		mApplication.showProgressDialog(mActivity, R.string.update_reminders);
+		mApplication.showProgressDialog(getActivity(), R.string.update_reminders);
 	}
 
 	/**
@@ -518,7 +518,7 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 	public void endUpdateReminders(DefaultAsyncTaskResult result) {
 		mApplication.hideProgressDialog();
 		if (Constants.OK == result.resultId) {
-			mApplication.showMessageInfo(mActivity, result.resultMessage);
+			mApplication.showMessageInfo(getActivity(), result.resultMessage);
 		} else {
 			showMessageError(R.string.attention, result.resultMessage);
 		}
@@ -570,7 +570,7 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 	 *            The task ID: SMS or Call.
 	 */
 	private void choseContactPhone(final Contact contact, final int taskId) {
-		new AlertDialog.Builder(mActivity)
+		new AlertDialog.Builder(getActivity())
 				.setTitle(R.string.phone_select)
 				.setItems(contact.getPhoneNumbers(),
 						new DialogInterface.OnClickListener() {
@@ -658,7 +658,7 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 	 */
 	@Override
 	public void startLoadPhonesContact() {
-		mApplication.showProgressDialog(mActivity, R.string.loading_wait);
+		mApplication.showProgressDialog(getActivity(), R.string.loading_wait);
 	}
 
 	/**
@@ -668,7 +668,7 @@ public abstract class ContactsListBaseFragment extends BaseFragment implements
 	public void endLoadPhonesContact(DefaultAsyncTaskResult result) {
 		mApplication.hideProgressDialog();
 		if (result.resultId != Constants.OK && result.resultMessage != null) {
-			mApplication.showMessageInfo(mActivity, result.resultMessage);
+			mApplication.showMessageInfo(getActivity(), result.resultMessage);
 		} else {
 			Contact contact = (Contact) result.object;
 			onSelectContact(contact, result.taskId);

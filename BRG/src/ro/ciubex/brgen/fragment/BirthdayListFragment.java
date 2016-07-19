@@ -60,7 +60,7 @@ public class BirthdayListFragment extends ContactsListBaseFragment implements
 	 */
 	@Override
 	public void sortStarted() {
-		mApplication.showProgressDialog(mActivity, R.string.please_wait);
+		mApplication.showProgressDialog(getActivity(), R.string.please_wait);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class BirthdayListFragment extends ContactsListBaseFragment implements
 
 	@Override
 	protected void backFromContactEditor() {
-		mActivity.displayView(MainActivity.FRG_CNT_LIST,
+		((MainActivity)getActivity()).displayView(MainActivity.FRG_CNT_LIST,
 				MainActivity.FORCE_RELOAD_CONTACTS);
 	}
 }

@@ -18,9 +18,6 @@
  */
 package ro.ciubex.brgen.fragment;
 
-import ro.ciubex.brgen.MainActivity;
-import ro.ciubex.brgen.MainApplication;
-import ro.ciubex.brgen.R;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
@@ -29,6 +26,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ro.ciubex.brgen.MainApplication;
+import ro.ciubex.brgen.R;
+
 /**
  * @author Claudiu Ciobotariu
  * 
@@ -36,10 +36,10 @@ import android.view.ViewGroup;
 public abstract class BaseFragment extends Fragment {
 	public static final int NO_CONTENT_ID = -1;
 	protected MainApplication mApplication;
-	protected MainActivity mActivity;
 	protected View mFragmentView;
 	protected int mContentId;
 	protected DatePickerDialogFragment mDatePickerDlg;
+	protected AlertDialog mAlertDialog;
 
 	public BaseFragment() {
 	}
@@ -52,8 +52,7 @@ public abstract class BaseFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mActivity = (MainActivity) getActivity();
-		mApplication = (MainApplication) mActivity.getApplication();
+		mApplication = (MainApplication) getActivity().getApplication();
 	}
 
 	/*
@@ -86,7 +85,7 @@ public abstract class BaseFragment extends Fragment {
 	protected void initFragment() {
 		mDatePickerDlg = new DatePickerDialogFragment();
 		mDatePickerDlg.setMainApplication(mApplication);
-		mDatePickerDlg.setActivity(mActivity);
+		mDatePickerDlg.setActivity(getActivity());
 	}
 
 	/**
@@ -155,7 +154,8 @@ public abstract class BaseFragment extends Fragment {
 	 */
 	private void showMessageDialog(int titleStringId, String message,
 			int iconId, final int messageId, final Object anObject) {
-		new AlertDialog.Builder(mActivity)
+		cleanupAlertDialog();
+		mAlertDialog = new AlertDialog.Builder(getActivity())
 				.setIcon(iconId)
 				.setTitle(getString(titleStringId))
 				.setMessage(message)
@@ -166,6 +166,17 @@ public abstract class BaseFragment extends Fragment {
 								onMessageOk(messageId, anObject);
 							}
 						}).show();
+	}
+
+	/**
+	 * Cleanup existing alert dialog.
+	 */
+	public void cleanupAlertDialog() {
+		if (mAlertDialog != null) {
+			if (mAlertDialog.isShowing()) {
+				mAlertDialog.dismiss();
+			}
+		}
 	}
 
 	/**
@@ -183,7 +194,8 @@ public abstract class BaseFragment extends Fragment {
 	 */
 	public void showConfirmationDialog(int titleStringId, String message,
 			final int confirmationId, final Object anObject) {
-		new AlertDialog.Builder(mActivity)
+		cleanupAlertDialog();
+		mAlertDialog = new AlertDialog.Builder(getActivity())
 				.setIcon(android.R.drawable.ic_dialog_alert)
 				.setTitle(titleStringId)
 				.setMessage(message)

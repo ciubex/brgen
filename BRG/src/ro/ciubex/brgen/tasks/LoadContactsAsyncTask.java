@@ -49,11 +49,11 @@ public class LoadContactsAsyncTask extends
 	 * Responder used on loading process.
 	 */
 	public interface Responder {
-		public Application getApplication();
+		Application getApplication();
 
-		public void startLoadContacts();
+		void startLoadContacts();
 
-		public void endLoadContacts(DefaultAsyncTaskResult result);
+		void endLoadContacts(DefaultAsyncTaskResult result);
 	}
 
 	private List<Contact> mContacts;

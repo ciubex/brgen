@@ -77,7 +77,7 @@ public class LicenseFragment extends BaseFragment {
 	 * Invoked when is pressed the OK button.
 	 */
 	private void onClickOk() {
-		mActivity.displayView(MainActivity.FRG_ABOUT, -1);
+		((MainActivity)getActivity()).displayView(MainActivity.FRG_ABOUT, -1);
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class LicenseFragment extends BaseFragment {
 	 * @return The license text
 	 */
 	private String getStreamText(String fileName) {
-		AssetManager assetManager = mActivity.getAssets();
+		AssetManager assetManager = getActivity().getAssets();
 		StringBuilder sb = new StringBuilder();
 		InputStream in = null;
 		try {

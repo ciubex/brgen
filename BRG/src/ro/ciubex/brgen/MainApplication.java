@@ -18,6 +18,16 @@
  */
 package ro.ciubex.brgen;
 
+import android.annotation.TargetApi;
+import android.app.Application;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -28,16 +38,6 @@ import ro.ciubex.brgen.model.Contact;
 import ro.ciubex.brgen.util.ApplicationPreferences;
 import ro.ciubex.brgen.util.CalendarUtils;
 import ro.ciubex.brgen.util.Utilities;
-
-import android.annotation.TargetApi;
-import android.app.Application;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.widget.Toast;
 
 /**
  * This is main application class.
@@ -70,12 +70,18 @@ public class MainApplication extends Application {
     public static final String KEY_APP_THEME = "appTheme";
 
     public static final List<String> FUNCTIONAL_PERMISSIONS = Arrays.asList(
-            PERMISSION_FOR_READ_CONTACTS,
-            PERMISSION_FOR_WRITE_CONTACTS,
-            PERMISSION_FOR_READ_CALENDAR,
-            PERMISSION_FOR_WRITE_CALENDAR,
             PERMISSION_FOR_READ_EXTERNAL_STORAGE,
             PERMISSION_FOR_WRITE_EXTERNAL_STORAGE
+    );
+
+    public static final List<String> CONTACTS_PERMISSIONS = Arrays.asList(
+            PERMISSION_FOR_READ_CONTACTS,
+            PERMISSION_FOR_WRITE_CONTACTS
+    );
+
+    public static final List<String> CALENDAR_PERMISSIONS = Arrays.asList(
+            PERMISSION_FOR_READ_CALENDAR,
+            PERMISSION_FOR_WRITE_CALENDAR
     );
 
     /**
@@ -455,11 +461,41 @@ public class MainApplication extends Application {
     }
 
     /**
+     * Check if the application have contacts permissions.
+     *
+     * @return True if all functional contacts are allowed.
+     */
+    public boolean haveContactsPermissions() {
+        for (String permission : MainApplication.CONTACTS_PERMISSIONS) {
+            if (!hasPermission(permission)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Check if the application have calendar permissions.
+     *
+     * @return True if all calendar permissions are allowed.
+     */
+    public boolean haveCalendarPermissions() {
+        for (String permission : MainApplication.CALENDAR_PERMISSIONS) {
+            if (!hasPermission(permission)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Get all not granted permissions.
      */
     public String[] getNotGrantedPermissions() {
         List<String> permissions = new ArrayList<>();
+        buildRequiredPermissions(permissions, MainApplication.CONTACTS_PERMISSIONS, true);
         buildRequiredPermissions(permissions, MainApplication.FUNCTIONAL_PERMISSIONS, true);
+        buildRequiredPermissions(permissions, MainApplication.CALENDAR_PERMISSIONS, true);
         String[] array = null;
         if (!permissions.isEmpty()) {
             array = new String[permissions.size()];
@@ -475,7 +511,9 @@ public class MainApplication extends Application {
      */
     public String[] getAllRequiredPermissions() {
         List<String> permissions = new ArrayList<>();
+        buildRequiredPermissions(permissions, MainApplication.CONTACTS_PERMISSIONS, true);
         buildRequiredPermissions(permissions, MainApplication.FUNCTIONAL_PERMISSIONS, false);
+        buildRequiredPermissions(permissions, MainApplication.CALENDAR_PERMISSIONS, true);
         String[] array = null;
         if (!permissions.isEmpty()) {
             array = new String[permissions.size()];

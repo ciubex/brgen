@@ -25,7 +25,7 @@ package ro.ciubex.brgen.model;
  * 
  */
 public interface Constants {
-	public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-	public static final int OK = 0;
-	public static final int ERROR = 1;
+	String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+	int OK = 0;
+	int ERROR = 1;
 }

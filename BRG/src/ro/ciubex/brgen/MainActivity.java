@@ -104,21 +104,17 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
 
-        mNavDrawerItems = new ArrayList<SlideMenuItem>();
+        mNavDrawerItems = new ArrayList<>();
 
         // adding nav drawer items to array
         // Contact list
-        mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[0], mNavMenuIcons
-                .getResourceId(0, -1)));
+        mNavDrawerItems.add(getSlideMenuItem(0));
         // Birthdays list
-        mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[1], mNavMenuIcons
-                .getResourceId(1, -1)));
+        mNavDrawerItems.add(getSlideMenuItem(1));
         // Settings
-        mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[2], mNavMenuIcons
-                .getResourceId(2, -1)));
+        mNavDrawerItems.add(getSlideMenuItem(2));
         // About
-        mNavDrawerItems.add(new SlideMenuItem(mNavMenuTitles[3], mNavMenuIcons
-                .getResourceId(3, -1)));
+        mNavDrawerItems.add(getSlideMenuItem(3));
 
         // Recycle the typed array
         mNavMenuIcons.recycle();
@@ -164,6 +160,16 @@ public class MainActivity extends AppCompatActivity {
             // on first time display view for first nav item
             displayView(mFragmentIdCurrent, -1);
         }
+    }
+
+    /**
+     * Get corresponding slide menu item.
+     *
+     * @param index The menu item index.
+     * @return The created slide menu item.
+     */
+    private SlideMenuItem getSlideMenuItem(int index) {
+        return new SlideMenuItem(mNavMenuTitles[index], mNavMenuIcons.getResourceId(index, -1));
     }
 
     /**
@@ -383,6 +389,16 @@ public class MainActivity extends AppCompatActivity {
         checkForPermissions();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        for (Fragment fragment : mFragments) {
+            if (fragment instanceof BaseFragment) {
+                ((BaseFragment)fragment).cleanupAlertDialog();
+            }
+        }
+    }
+
     /**
      * Method used to check for application permissions.
      */
@@ -419,6 +435,20 @@ public class MainActivity extends AppCompatActivity {
             for (String permission : permissions) {
                 mApplication.markPermissionAsked(permission);
             }
+            updateApplicationPermissions();
+        }
+    }
+
+    /**
+     * Update application dependencies based on the granted permissions.
+     */
+    private void updateApplicationPermissions() {
+        if (mApplication.haveCalendarPermissions()) {
+            mApplication.getCalendarUtils().initCalendars();
+        }
+        if (mApplication.haveContactsPermissions()) {
+            ((ContactsListFragment) mFragments[FRG_CNT_LIST])
+                    .reloadContactList();
         }
     }
 }

@@ -18,8 +18,6 @@
  */
 package ro.ciubex.brgen.fragment;
 
-import ro.ciubex.brgen.MainActivity;
-import ro.ciubex.brgen.R;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -32,6 +30,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import ro.ciubex.brgen.MainActivity;
+import ro.ciubex.brgen.R;
 
 /**
  * Define About activity.
@@ -78,8 +79,8 @@ public class AboutFragment extends BaseFragment {
 		String version = "1.0";
 		String aboutText = "";
 		try {
-			version = mActivity.getPackageManager().getPackageInfo(
-					mActivity.getPackageName(), 0).versionName;
+			version = getActivity().getPackageManager().getPackageInfo(
+					getActivity().getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
 			Log.e(TAG, e.getMessage(), e);
 		}
@@ -127,7 +128,7 @@ public class AboutFragment extends BaseFragment {
 	 * Method invoked when is pressed the license button.
 	 */
 	private void onClickLicense(int contentId) {
-		mActivity.displayView(MainActivity.FRG_LICENSE, contentId);
+		((MainActivity)getActivity()).displayView(MainActivity.FRG_LICENSE, contentId);
 	}
 
 	/**
@@ -135,7 +136,7 @@ public class AboutFragment extends BaseFragment {
 	 */
 	private void onClickDonate() {
 		if (donate == null) {
-			donate = new AlertDialog.Builder(mActivity)
+			donate = new AlertDialog.Builder(getActivity())
 					.setIcon(android.R.drawable.ic_dialog_alert)
 					.setTitle(R.string.donate_title)
 					.setMessage(R.string.donate_message)
